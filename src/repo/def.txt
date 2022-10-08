@@ -1,0 +1,3 @@
+repo/model
+berisikan code yang berhubungan dengan akses db
+biasanya dibentuk promise

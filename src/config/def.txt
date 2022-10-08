@@ -1,0 +1,2 @@
+folder config digunakan untuk menyimpan konfigurasi backend
+- db
