@@ -34,6 +34,7 @@ const get = async (req, res) => {
       result: response.rows,
     });
   } catch (err) {
+    res.status(404).json({ msg: "Data Not Found!" });
     res.status(500).json({
       msg: "Internal Server Error",
     });
@@ -58,6 +59,7 @@ const filter = async (req, res) => {
       result: response.rows,
     });
   } catch (error) {
+    res.status(404).json({ msg: "Data Not Found!" });
     res.status(500).json({
       msg: "Internal Server Error",
     });
