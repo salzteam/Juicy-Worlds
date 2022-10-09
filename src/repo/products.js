@@ -114,7 +114,6 @@ const filterProducts = (queryParams) => {
       query += `lower(products.${key}::text) = lower($1)`;
       values.push(queryParams[key]);
     });
-    console.log(query);
     postgreDb
       .query(query, values)
       .then((response) => {
