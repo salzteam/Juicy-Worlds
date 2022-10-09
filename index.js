@@ -1,9 +1,9 @@
+require("dotenv").config();
 const express = require("express");
-
 const postgreDb = require("./src/config/postgre");
 const mainRouter = require("./src/routes/main");
 const server = express();
-const PORT = 8080;
+const { PORT } = process.env;
 
 postgreDb
   .connect()
