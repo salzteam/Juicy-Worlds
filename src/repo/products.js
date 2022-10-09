@@ -107,15 +107,23 @@ const searchProducts = (queryParams) => {
 
 const filterProducts = (queryParams) => {
   return new Promise((resolve, reject) => {
-    const query =
-      "select products_id, name_product, price, description, stock, size, category,start_deliv, end_deliv from products where lower(products.category::text) = lower($1)";
-    postgreDb.query(query, [queryParams.search], (err, result) => {
-      if (err) {
-        console.log(err);
-        return reject(err);
-      }
-      return resolve(result);
+    let query =
+      "select products_id, name_product, price, description, stock, size, category,deliv_method,start_deliv, end_deliv from products where ";
+    const values = [];
+    Object.keys(queryParams).forEach((key) => {
+      query += `lower(products.${key}::text) = lower($1)`;
+      values.push(queryParams[key]);
     });
+    console.log(query);
+    postgreDb
+      .query(query, values)
+      .then((response) => {
+        resolve(response);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject(err);
+      });
   });
 };
 
