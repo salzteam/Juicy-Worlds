@@ -124,16 +124,10 @@ const sortingProducts = (queryParams) => {
     let query =
       "select products_id, name_product, price, description, stock, size, category,start_deliv, end_deliv, create_at from products order by ";
     const values = [];
-    Object.keys(queryParams).forEach((key, idx, array) => {
-      if (idx === array.length - 1) {
-        query += `${key} `;
-        values.push(queryParams[key]);
-        return;
-      }
-      query += `${key} , `;
+    Object.keys(queryParams).forEach((key) => {
+      query += `${key} `;
       values.push(queryParams[key]);
     });
-    console.log(values);
     console.log(query);
     postgreDb
       .query(query)
