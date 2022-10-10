@@ -80,12 +80,13 @@ const editProducts = (body, params) => {
 const getProducts = () => {
   return new Promise((resolve, reject) => {
     const query =
-      "select name_product, price, description, stock, size,category, deliv_method, start_deliv,end_deliv from products";
+      "select products_id, name_product, price, description, stock, size,category, deliv_method, start_deliv,end_deliv from products";
     postgreDb.query(query, (err, result) => {
       if (err) {
         console.log(err);
         return reject(err);
       }
+      if (result.rows.length == 0) return reject(404);
       return resolve(result);
     });
   });
@@ -100,6 +101,7 @@ const searchProducts = (queryParams) => {
         console.log(err);
         return reject(err);
       }
+      if (result.rows.length == 0) return reject(404);
       return resolve(result);
     });
   });
@@ -130,10 +132,27 @@ const sortingProducts = (queryParams) => {
   return new Promise((resolve, reject) => {
     let query =
       "select products_id, name_product, price, description, stock, size, category,start_deliv, end_deliv, create_at from products order by ";
-    const values = [];
     Object.keys(queryParams).forEach((key) => {
       query += `${key} `;
-      values.push(queryParams[key]);
+    });
+    console.log(query);
+    postgreDb
+      .query(query)
+      .then((response) => {
+        resolve(response);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject(err);
+      });
+  });
+};
+const sortingTransaction = (queryParams) => {
+  return new Promise((resolve, reject) => {
+    let query =
+      "select p.products_id, p.name_product, p.price, p.description, p.stock, p.size, p.category, p.start_deliv, p.end_deliv, p.create_at, count(t.product_id) as count from products p left join transactions t on p.products_id = t.product_id group by p.products_id, p.name_product, p.price, p.description, p.stock, p.size, p.category, p.start_deliv, p.end_deliv, p.create_at order by count ";
+    Object.keys(queryParams).forEach((key) => {
+      query += `${key} `;
     });
     console.log(query);
     postgreDb
@@ -156,6 +175,7 @@ const productsRepo = {
   searchProducts,
   filterProducts,
   sortingProducts,
+  sortingTransaction,
 };
 
 module.exports = productsRepo;

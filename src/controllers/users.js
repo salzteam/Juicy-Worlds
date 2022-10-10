@@ -11,14 +11,6 @@ const create = async (req, res) => {
     res.status(500).json({ msg: "Internal Server Error" });
   }
 };
-const drop = async (req, res) => {
-  try {
-    const result = await usersRepo.deleteUsers(req.params);
-    res.status(200).json({ result });
-  } catch (err) {
-    res.status(500).json({ msg: "Internal Server Error" });
-  }
-};
 const edit = async (req, res) => {
   try {
     const response = await usersRepo.editUsers(req.body, req.params);
@@ -41,7 +33,6 @@ const get = async (req, res) => {
 };
 const usersControllers = {
   create,
-  drop,
   edit,
   get,
 };

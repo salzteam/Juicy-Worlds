@@ -39,27 +39,10 @@ const createUsers = (body) => {
   });
 };
 
-const deleteUsers = (params) => {
-  return new Promise((resolve, reject) => {
-    const query = "delete from users where users_id = $1";
-    // OR => logika atau sql
-    // "OR" => string OR
-    postgreDb.query(query, [params.id], (err, result) => {
-      if (err) {
-        console.log(err);
-        return reject(err);
-      }
-      resolve(result);
-    });
-  });
-};
 const editUsers = (body, params) => {
   return new Promise((resolve, reject) => {
     let query = "update users set ";
     const values = [];
-    // {author, title, publisher}
-    // logika ini dibuat dengan mengasumsikan ada middleware validasi
-    // validasi untuk menghilangkan properti object dari body yang tidak diinginkan
     Object.keys(body).forEach((key, idx, array) => {
       if (idx === array.length - 1) {
         query += `${key} = $${idx + 1}, update_at = now() where users_id = $${
@@ -71,10 +54,6 @@ const editUsers = (body, params) => {
       query += `${key} = $${idx + 1},`;
       values.push(body[key]);
     });
-    // res.json({
-    //   query,
-    //   values,
-    // });
     postgreDb
       .query(query, values)
       .then((response) => {
@@ -101,7 +80,6 @@ const getUsers = () => {
 };
 const usersRepo = {
   createUsers,
-  deleteUsers,
   editUsers,
   getUsers,
 };

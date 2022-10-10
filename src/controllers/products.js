@@ -4,7 +4,7 @@ const create = async (req, res) => {
   try {
     const response = await productsRepo.createProducts(req.body);
     res.status(201).json({
-      result: response,
+      msg: "Product added to database",
     });
   } catch (err) {
     console.log(err);
@@ -14,7 +14,7 @@ const create = async (req, res) => {
 const drop = async (req, res) => {
   try {
     const result = await productsRepo.deleteProducts(req.params);
-    res.status(200).json({ result });
+    res.status(200).json({ msg: "Data deleted from database" });
   } catch (err) {
     res.status(500).json({ msg: "Internal Server Error" });
   }
@@ -22,19 +22,24 @@ const drop = async (req, res) => {
 const edit = async (req, res) => {
   try {
     const response = await productsRepo.editProducts(req.body, req.params);
-    res.status(200).json({ result: response });
+    res.status(200).json({ msg: "Data has been updated" });
   } catch (err) {
     res.status(500).json({ msg: "Internal Server Error" });
   }
 };
 const get = async (req, res) => {
   try {
-    const response = await productsRepo.getProducts();
+    const response = await productsRepo.getProducts(req.query);
     res.status(200).json({
       result: response.rows,
     });
   } catch (err) {
-    res.status(404).json({ msg: "Data Not Found!" });
+    if (err == 404) {
+      res.status(404).json({
+        msg: "Data Not Found",
+      });
+      return;
+    }
     res.status(500).json({
       msg: "Internal Server Error",
     });
@@ -47,6 +52,12 @@ const search = async (req, res) => {
       result: response.rows,
     });
   } catch (error) {
+    if (error == 404) {
+      res.status(404).json({
+        msg: "Data Not Found",
+      });
+      return;
+    }
     res.status(500).json({
       msg: "Internal Server Error",
     });
@@ -76,6 +87,19 @@ const sorting = async (req, res) => {
     });
   }
 };
+const sortingTrans = async (req, res) => {
+  try {
+    const response = await productsRepo.sortingTransaction(req.query);
+    res.status(200).json({
+      result: response.rows,
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "Internal Server Error",
+    });
+  }
+};
+
 const productsControllers = {
   create,
   drop,
@@ -84,6 +108,7 @@ const productsControllers = {
   search,
   filter,
   sorting,
+  sortingTrans,
 };
 
 module.exports = productsControllers;
