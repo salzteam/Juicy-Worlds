@@ -109,4 +109,52 @@ const productsRepo = {
   getProducts,
 };
 
+const getProductss = (queryParams) => {
+  return new Promise((resolve, reject) => {
+    let query = `select * from products`;
+    if (queryParams.keyword) {
+      query += ` where lower(name_product) like lower('%${queryParams.keyword}%')`;
+    }
+    if (queryParams.filter) {
+      if (queryParams.keyword) {
+        query += ` and lower(category) like lower('%${queryParams.filter}%')`;
+      } else {
+        query += ` where lower(category) like lower ('%${queryParams.filter}')`;
+      }
+    }
+    if (queryParams.sort == "early_start") {
+      query += ` order by starthours asc`;
+    }
+    if (queryParams.sort == "latest_start") {
+      query += ` order by starthours desc`;
+    }
+    if (queryParams.sort == "early_end") {
+      query += ` order by endhours asc`;
+    }
+    if (queryParams.sort == "latest_end") {
+      query += ` order by endhours dsc`;
+    }
+    if (queryParams.sort == "unpopular") {
+      query += ` order by sold asc`;
+    }
+    if (queryParams.sort == "popular") {
+      query += ` order by sold desc`;
+    }
+    if (queryParams.sort == "cheap") {
+      query += ` order by price asc `;
+    }
+    if (queryParams.sort == "pricey") {
+      query += ` order by price desc `;
+    }
+
+    console.log(query);
+    postgreDb.query(query, (err, result) => {
+      if (err) {
+        console.log(err);
+        return reject(err);
+      }
+      return resolve(result);
+    });
+  });
+};
 module.exports = productsRepo;
