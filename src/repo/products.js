@@ -155,7 +155,7 @@ const sortingProducts = (queryParams) => {
       query += `asc`;
     }
     if (queryParams.sort == "desc") {
-      query += `desc`;
+      query += `descc`;
     }
     postgreDb.query(query, (err, result) => {
       if (err) {
