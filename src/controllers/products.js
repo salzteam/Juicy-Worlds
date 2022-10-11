@@ -100,19 +100,6 @@ const sorting = async (req, res) => {
     });
   }
 };
-const sortingTrans = async (req, res) => {
-  try {
-    const response = await productsRepo.sortingTransaction(req.query);
-    res.status(200).json({
-      result: response.rows,
-    });
-  } catch (error) {
-    res.status(500).json({
-      msg: "Internal Server Error",
-    });
-  }
-};
-
 const productsControllers = {
   create,
   drop,
@@ -121,7 +108,6 @@ const productsControllers = {
   search,
   filter,
   sorting,
-  sortingTrans,
 };
 
 module.exports = productsControllers;

@@ -9,7 +9,6 @@ const {
   search,
   filter,
   sorting,
-  sortingTrans,
 } = require("../controllers/products");
 productsRouter.post("/", create);
 productsRouter.delete("/:id", drop);
@@ -18,5 +17,4 @@ productsRouter.get("/", get);
 productsRouter.get("/search", search);
 productsRouter.get("/search/filter", filter);
 productsRouter.get("/search/sorting", sorting);
-productsRouter.get("/search/sorting/transactions", sortingTrans);
 module.exports = productsRouter;

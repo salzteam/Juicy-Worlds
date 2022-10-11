@@ -141,43 +141,32 @@ const filterProducts = (queryParams) => {
 
 const sortingProducts = (queryParams) => {
   return new Promise((resolve, reject) => {
-    let query =
-      "select products_id, name_product, price, description, stock, size, category,start_deliv, end_deliv, create_at from products order by ";
-    Object.keys(queryParams).forEach((key) => {
-      query += `${key} `;
-    });
-    console.log(query);
-    postgreDb
-      .query(query)
-      .then((response) => {
-        resolve(response);
-      })
-      .catch((err) => {
+    let query = `select products_id, name_product, price, description, stock, size, category,start_deliv, end_deliv, create_at from products order by `;
+    if (queryParams.orderby == "price") {
+      query += `price `;
+    }
+    if (queryParams.orderby == "create_at") {
+      query += `create_at `;
+    }
+    if (queryParams.orderby == "transactions") {
+      query = `select p.products_id, p.name_product, p.price, p.description, p.stock, p.size, p.category, p.start_deliv, p.end_deliv, p.create_at, count(t.product_id) as count from products p left join transactions t on p.products_id = t.product_id group by p.products_id, p.name_product, p.price, p.description, p.stock, p.size, p.category, p.start_deliv, p.end_deliv, p.create_at order by count  `;
+    }
+    if (queryParams.sort == "asc") {
+      query += `asc`;
+    }
+    if (queryParams.sort == "desc") {
+      query += `desc`;
+    }
+    postgreDb.query(query, (err, result) => {
+      if (err) {
         console.log(err);
-        reject(err);
-      });
+        return reject(err);
+      }
+      if (result.rows.length == 0) return reject(404);
+      return resolve(result);
+    });
   });
 };
-const sortingTransaction = (queryParams) => {
-  return new Promise((resolve, reject) => {
-    let query =
-      "select p.products_id, p.name_product, p.price, p.description, p.stock, p.size, p.category, p.start_deliv, p.end_deliv, p.create_at, count(t.product_id) as count from products p left join transactions t on p.products_id = t.product_id group by p.products_id, p.name_product, p.price, p.description, p.stock, p.size, p.category, p.start_deliv, p.end_deliv, p.create_at order by count ";
-    Object.keys(queryParams).forEach((key) => {
-      query += `${key} `;
-    });
-    console.log(query);
-    postgreDb
-      .query(query)
-      .then((response) => {
-        resolve(response);
-      })
-      .catch((err) => {
-        console.log(err);
-        reject(err);
-      });
-  });
-};
-
 const productsRepo = {
   createProducts,
   deleteProducts,
@@ -186,7 +175,6 @@ const productsRepo = {
   searchProducts,
   filterProducts,
   sortingProducts,
-  sortingTransaction,
 };
 
 module.exports = productsRepo;
