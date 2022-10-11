@@ -88,26 +88,13 @@ const editProducts = (body, params) => {
       });
   });
 };
-const getProducts = () => {
+const getProducts = (queryParams) => {
   return new Promise((resolve, reject) => {
-    const query =
-      "select products_id, name_product, price, description, stock, size,category, deliv_method, start_deliv,end_deliv from products";
+    let query = `select products_id, name_product, price, description, stock, size,category, deliv_method, start_deliv,end_deliv from products`;
+    if (queryParams.search) {
+      query += ` where lower(name_product) like lower('%${queryParams.search}%')`;
+    }
     postgreDb.query(query, (err, result) => {
-      if (err) {
-        console.log(err);
-        return reject(err);
-      }
-      if (result.rows.length == 0) return reject(404);
-      return resolve(result);
-    });
-  });
-};
-
-const searchProducts = (queryParams) => {
-  return new Promise((resolve, reject) => {
-    const query =
-      "select products_id, name_product, price, description, stock, size, category,start_deliv, end_deliv from products where lower(name_product) like lower($1)";
-    postgreDb.query(query, [`%${queryParams.search}%`], (err, result) => {
       if (err) {
         console.log(err);
         return reject(err);
@@ -172,7 +159,6 @@ const productsRepo = {
   deleteProducts,
   editProducts,
   getProducts,
-  searchProducts,
   filterProducts,
   sortingProducts,
 };

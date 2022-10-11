@@ -58,24 +58,6 @@ const get = async (req, res) => {
     });
   }
 };
-const search = async (req, res) => {
-  try {
-    const response = await productsRepo.searchProducts(req.query);
-    res.status(200).json({
-      result: response.rows,
-    });
-  } catch (error) {
-    if (error == 404) {
-      res.status(404).json({
-        msg: "Data Not Found",
-      });
-      return;
-    }
-    res.status(500).json({
-      msg: "Internal Server Error",
-    });
-  }
-};
 const filter = async (req, res) => {
   try {
     const response = await productsRepo.filterProducts(req.query);
@@ -105,7 +87,6 @@ const productsControllers = {
   drop,
   edit,
   get,
-  search,
   filter,
   sorting,
 };
