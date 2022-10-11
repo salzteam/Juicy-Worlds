@@ -5,6 +5,7 @@ const createTransactions = (body) => {
     const query =
       "insert into transactions (user_id, product_id, timeset, payment, promo_id) values ($1,$2,$3,$4,$5)";
     const { user_id, product_id, timeset, payment, promo_id } = body;
+    const ress = [user_id, product_id, timeset, payment, promo_id];
     postgreDb.query(
       query,
       [user_id, product_id, timeset, payment, promo_id],
@@ -13,7 +14,7 @@ const createTransactions = (body) => {
           console.log(err);
           return reject(err);
         }
-        resolve(queryResult);
+        resolve(ress);
       }
     );
   });
@@ -49,7 +50,7 @@ const editTransactions = (body, params) => {
     postgreDb
       .query(query, values)
       .then((response) => {
-        resolve(response);
+        resolve([body, params.id]);
       })
       .catch((err) => {
         console.log(err);

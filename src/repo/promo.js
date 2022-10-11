@@ -14,6 +14,16 @@ const createPromo = (body) => {
       product_id,
       size,
     } = body;
+    const ress = [
+      couponcode,
+      discname,
+      description,
+      free,
+      startdate,
+      enddate,
+      product_id,
+      size,
+    ];
     postgreDb.query(
       query,
       [
@@ -31,7 +41,7 @@ const createPromo = (body) => {
           console.log(err);
           return reject(err);
         }
-        resolve(queryResult);
+        resolve(ress);
       }
     );
   });
@@ -67,7 +77,7 @@ const editPromo = (body, params) => {
     postgreDb
       .query(query, values)
       .then((response) => {
-        resolve(response);
+        resolve([body, params.id]);
       })
       .catch((err) => {
         console.log(err);
@@ -92,11 +102,12 @@ const searchPromo = (queryParams) => {
   return new Promise((resolve, reject) => {
     const query =
       "select p.promo_id, p.couponcode, p.discname, p.description, pr.name_product,pr.price,pr.description,pr.category,p.free, startdate, enddate from promo p join products pr on p.product_id = pr.products_id where lower(discname) like lower($1)";
-    postgreDb.query(query, [`%${queryParams.nama}%`], (err, result) => {
+    postgreDb.query(query, [`%${queryParams.couponcode}%`], (err, result) => {
       if (err) {
         console.log(err);
         return reject(err);
       }
+      if (result.rows.length == 0) return reject(404);
       return resolve(result);
     });
   });

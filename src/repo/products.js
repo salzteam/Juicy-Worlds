@@ -15,6 +15,17 @@ const createProducts = (body) => {
       end_deliv,
       category,
     } = body;
+    const ress = [
+      name_product,
+      price,
+      description,
+      stock,
+      size,
+      deliv_method,
+      start_deliv,
+      end_deliv,
+      category,
+    ];
     postgreDb.query(
       query,
       [
@@ -33,7 +44,7 @@ const createProducts = (body) => {
           console.log(err);
           return reject(err);
         }
-        resolve(queryResult);
+        resolve(ress);
       }
     );
   });
@@ -69,7 +80,7 @@ const editProducts = (body, params) => {
     postgreDb
       .query(query, values)
       .then((response) => {
-        resolve(response);
+        resolve([body, params.id]);
       })
       .catch((err) => {
         console.log(err);

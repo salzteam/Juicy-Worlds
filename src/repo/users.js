@@ -15,6 +15,17 @@ const createUsers = (body) => {
       phone,
       gender,
     } = body;
+    const ress = [
+      displayname,
+      firstname,
+      lastname,
+      date_of_birth,
+      adress,
+      email,
+      password,
+      phone,
+      gender,
+    ];
     postgreDb.query(
       query,
       [
@@ -33,7 +44,7 @@ const createUsers = (body) => {
           console.log(err);
           return reject(err);
         }
-        resolve(queryResult);
+        resolve(ress);
       }
     );
   });
@@ -57,7 +68,7 @@ const editUsers = (body, params) => {
     postgreDb
       .query(query, values)
       .then((response) => {
-        resolve(response);
+        resolve([body, params.id]);
       })
       .catch((err) => {
         console.log(err);
@@ -68,7 +79,7 @@ const editUsers = (body, params) => {
 const getUsers = () => {
   return new Promise((resolve, reject) => {
     const query =
-      "select displayname, firstname, lastname, date_of_birth, adress, email, password, phone, gender from users";
+      "select users_id, displayname, firstname, lastname, date_of_birth, adress, email, password, phone, gender from users";
     postgreDb.query(query, (err, result) => {
       if (err) {
         console.log(err);
