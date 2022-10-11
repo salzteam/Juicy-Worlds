@@ -5,14 +5,7 @@ const create = async (req, res) => {
     const response = await promoRepo.createPromo(req.body);
     res.status(201).json({
       result: "Data Create Results",
-      couponcode: response[0],
-      discname: response[1],
-      description: response[2],
-      free: response[3],
-      startdate: response[4],
-      enddate: response[5],
-      product_id: response[6],
-      size: response[7],
+      data: response,
     });
   } catch (err) {
     console.log(err);
@@ -33,7 +26,7 @@ const edit = async (req, res) => {
     res.status(200).json({
       msg: "Data has been updated",
       data_id: response[1],
-      List_update_data: response[0],
+      data: response[0],
     });
   } catch (err) {
     res.status(500).json({ msg: "Internal Server Error" });

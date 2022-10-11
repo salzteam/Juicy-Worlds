@@ -15,17 +15,17 @@ const createUsers = (body) => {
       phone,
       gender,
     } = body;
-    const ress = [
-      displayname,
-      firstname,
-      lastname,
-      date_of_birth,
-      adress,
-      email,
-      password,
-      phone,
-      gender,
-    ];
+    const ress = {
+      Display_Name: displayname,
+      First_Name: firstname,
+      Last_Name: lastname,
+      Date_Of_Birth: date_of_birth,
+      Adress: adress,
+      Email: email,
+      Password: password,
+      Phone: phone,
+      Gender: gender,
+    };
     postgreDb.query(
       query,
       [

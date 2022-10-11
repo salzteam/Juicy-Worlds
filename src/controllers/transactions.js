@@ -5,11 +5,7 @@ const create = async (req, res) => {
     const response = await transactionsRepo.createTransactions(req.body);
     res.status(201).json({
       result: "Data Create Results",
-      user_id: response[0],
-      product_id: response[1],
-      timeset: response[2],
-      payment: response[3],
-      promo_id: response[4],
+      data: response,
     });
   } catch (err) {
     console.log(err);
@@ -33,7 +29,7 @@ const edit = async (req, res) => {
     res.status(200).json({
       msg: "Data has been updated",
       data_id: response[1],
-      List_update_data: response[0],
+      data: response[0],
     });
   } catch (err) {
     res.status(500).json({ msg: "Internal Server Error" });

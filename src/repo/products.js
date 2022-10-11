@@ -15,17 +15,18 @@ const createProducts = (body) => {
       end_deliv,
       category,
     } = body;
-    const ress = [
-      name_product,
-      price,
-      description,
-      stock,
-      size,
-      deliv_method,
-      start_deliv,
-      end_deliv,
-      category,
-    ];
+    const ress = {
+      name: name_product,
+      price: price,
+      description: description,
+      stock: stock,
+      size: size,
+      deliv_method: deliv_method,
+      start_deliv: start_deliv,
+      end_deliv: end_deliv,
+      category: category,
+    };
+    console.log(ress);
     postgreDb.query(
       query,
       [
@@ -154,6 +155,7 @@ const sortingProducts = (queryParams) => {
     });
   });
 };
+
 const productsRepo = {
   createProducts,
   deleteProducts,

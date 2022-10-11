@@ -5,7 +5,13 @@ const createTransactions = (body) => {
     const query =
       "insert into transactions (user_id, product_id, timeset, payment, promo_id) values ($1,$2,$3,$4,$5)";
     const { user_id, product_id, timeset, payment, promo_id } = body;
-    const ress = [user_id, product_id, timeset, payment, promo_id];
+    const ress = {
+      User_id: user_id,
+      Product_id: product_id,
+      Timeset: timeset,
+      Payment: payment,
+      Promo_id: promo_id,
+    };
     postgreDb.query(
       query,
       [user_id, product_id, timeset, payment, promo_id],

@@ -5,15 +5,7 @@ const create = async (req, res) => {
     const response = await usersRepo.createUsers(req.body);
     res.status(201).json({
       result: "Data Create Results",
-      displayname: response[0],
-      firstname: response[1],
-      lastname: response[2],
-      date_of_birth: response[3],
-      adress: response[4],
-      email: response[5],
-      password: response[6],
-      phone: response[7],
-      gender: response[8],
+      data: response,
     });
   } catch (err) {
     console.log(err);
@@ -26,7 +18,7 @@ const edit = async (req, res) => {
     res.status(200).json({
       msg: "Data has been updated",
       data_id: response[1],
-      List_update_data: response[0],
+      data: response[0],
     });
   } catch (err) {
     res.status(500).json({ msg: "Internal Server Error" });

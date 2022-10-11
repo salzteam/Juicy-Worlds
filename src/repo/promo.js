@@ -14,16 +14,16 @@ const createPromo = (body) => {
       product_id,
       size,
     } = body;
-    const ress = [
-      couponcode,
-      discname,
-      description,
-      free,
-      startdate,
-      enddate,
-      product_id,
-      size,
-    ];
+    const ress = {
+      Coupon_Code: couponcode,
+      Discont_Name: discname,
+      Description: description,
+      Free: free,
+      Start: startdate,
+      Expired: enddate,
+      Product: product_id,
+      Size: size,
+    };
     postgreDb.query(
       query,
       [
