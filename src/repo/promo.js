@@ -2,54 +2,28 @@ const postgreDb = require("../config/postgre");
 
 const createPromo = (body) => {
   return new Promise((resolve, reject) => {
+    let { code, discount, product_id } = body;
     const query =
-      "insert into promo (couponcode, discname, description, free, startdate, enddate, product_id, size) values ($1,$2,$3,$4,$5,$6,$7,$8)";
-    const {
-      couponcode,
-      discname,
-      description,
-      free,
-      startdate,
-      enddate,
-      product_id,
-      size,
-    } = body;
-    const ress = {
-      Coupon_Code: couponcode,
-      Discont_Name: discname,
-      Description: description,
-      Free: free,
-      Start: startdate,
-      Expired: enddate,
-      Product: product_id,
-      Size: size,
-    };
-    postgreDb.query(
-      query,
-      [
-        couponcode,
-        discname,
-        description,
-        free,
-        startdate,
-        enddate,
-        product_id,
-        size,
-      ],
-      (err, queryResult) => {
-        if (err) {
-          console.log(err);
-          return reject(err);
-        }
-        resolve(ress);
+      "insert into promos (code, discount, product_id) values ($1,$2,$3) RETURNING id";
+    postgreDb.query(query, [code, discount, product_id], (err, queryResult) => {
+      if (err) {
+        console.log(err);
+        return reject(err);
       }
-    );
+      const ress = {
+        id: queryResult.rows[0].id,
+        code: code,
+        discount: discount + "%",
+        product_id: product_id,
+      };
+      resolve(ress);
+    });
   });
 };
 
 const deletePromo = (params) => {
   return new Promise((resolve, reject) => {
-    const query = "delete from promo where promo_id = $1";
+    const query = "delete from promos where id = $1";
     postgreDb.query(query, [params.id], (err, result) => {
       if (err) {
         console.log(err);
@@ -61,11 +35,11 @@ const deletePromo = (params) => {
 };
 const editPromo = (body, params) => {
   return new Promise((resolve, reject) => {
-    let query = "update promo set ";
+    let query = "update promos set ";
     const values = [];
     Object.keys(body).forEach((key, idx, array) => {
       if (idx === array.length - 1) {
-        query += `${key} = $${idx + 1}, update_at = now() where promo_id = $${
+        query += `${key} = $${idx + 1}, updated_at = now() where id = $${
           idx + 2
         }`;
         values.push(body[key], params.id);
@@ -85,29 +59,24 @@ const editPromo = (body, params) => {
       });
   });
 };
-const getPromo = () => {
+const getPromo = (queryParams) => {
   return new Promise((resolve, reject) => {
-    const query =
-      "select promo_id, couponcode, discname, description, free, size, startdate, enddate from promo";
+    let query = `select pr.code, pr.discount, p.product_name, p.price, c.category_name from promos pr left join products p on pr.product_id = p.id join categories c on p.category_id = c.id`;
+    if (queryParams.search) {
+      query += ` where lower(p.product_name) like lower('%${queryParams.search}%')`;
+    }
     postgreDb.query(query, (err, result) => {
       if (err) {
         console.log(err);
         return reject(err);
       }
-      return resolve(result);
-    });
-  });
-};
-const searchPromo = (queryParams) => {
-  return new Promise((resolve, reject) => {
-    const query =
-      "select p.promo_id, p.couponcode, p.discname, p.description, pr.name_product,pr.price,pr.description,pr.category,p.free, startdate, enddate from promo p join products pr on p.product_id = pr.products_id where lower(discname) like lower($1)";
-    postgreDb.query(query, [`%${queryParams.couponcode}%`], (err, result) => {
-      if (err) {
-        console.log(err);
-        return reject(err);
-      }
       if (result.rows.length == 0) return reject(404);
+      for (let i = 0; i < result.rows.length; i++) {
+        const priceDisc =
+          (result.rows[i].discount / 100) * result.rows[i].price;
+        const Finalprice = result.rows[i].price - priceDisc;
+        result.rows[i].price = Finalprice;
+      }
       return resolve(result);
     });
   });
@@ -117,7 +86,6 @@ const promoRepo = {
   deletePromo,
   editPromo,
   getPromo,
-  searchPromo,
 };
 
 module.exports = promoRepo;

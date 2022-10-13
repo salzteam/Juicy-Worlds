@@ -50,37 +50,11 @@ const get = async (req, res) => {
     });
   }
 };
-const filter = async (req, res) => {
-  try {
-    const response = await productsRepo.filterProducts(req.query);
-    res.status(200).json({
-      result: response.rows,
-    });
-  } catch (error) {
-    res.status(500).json({
-      msg: "Internal Server Error",
-    });
-  }
-};
-const sorting = async (req, res) => {
-  try {
-    const response = await productsRepo.sortingProducts(req.query);
-    res.status(200).json({
-      result: response.rows,
-    });
-  } catch (error) {
-    res.status(500).json({
-      msg: "Internal Server Error",
-    });
-  }
-};
 const productsControllers = {
   create,
   drop,
   edit,
   get,
-  filter,
-  sorting,
 };
 
 module.exports = productsControllers;

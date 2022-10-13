@@ -28,16 +28,16 @@ const edit = async (req, res) => {
     );
     res.status(200).json({
       msg: "Data has been updated",
-      data_id: response[1],
-      data: response[0],
+      data: req.body,
     });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ msg: "Internal Server Error" });
   }
 };
 const get = async (req, res) => {
   try {
-    const response = await transactionsRepo.getTransactions();
+    const response = await transactionsRepo.getTransactions(req.query);
     res.status(200).json({
       result: response.rows,
     });

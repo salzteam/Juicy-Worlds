@@ -34,29 +34,11 @@ const edit = async (req, res) => {
 };
 const get = async (req, res) => {
   try {
-    const response = await promoRepo.getPromo();
+    const response = await promoRepo.getPromo(req.params);
     res.status(200).json({
       result: response.rows,
     });
   } catch (err) {
-    res.status(500).json({
-      msg: "Internal Server Error",
-    });
-  }
-};
-const search = async (req, res) => {
-  try {
-    const response = await promoRepo.searchPromo(req.query);
-    res.status(200).json({
-      result: response.rows,
-    });
-  } catch (error) {
-    if (error == 404) {
-      res.status(404).json({
-        msg: "Data Not Found",
-      });
-      return;
-    }
     res.status(500).json({
       msg: "Internal Server Error",
     });
@@ -67,7 +49,6 @@ const promoControllers = {
   drop,
   edit,
   get,
-  search,
 };
 
 module.exports = promoControllers;
