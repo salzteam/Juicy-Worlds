@@ -18,8 +18,5 @@ mainRouter.get("/", (req, res) => {
     msg: "Welcome",
   });
 });
-mainRouter.post("/", imageUpload.single("image"), (req, res) => {
-  res.json({ url: `/images/${req.file.filename}` });
-});
 
 module.exports = mainRouter;
