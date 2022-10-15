@@ -1,48 +1,20 @@
 const promoRepo = require("../repo/promo");
 
 const create = async (req, res) => {
-  try {
-    const response = await promoRepo.createPromo(req.body);
-    res.status(201).json({
-      result: "Data Create Results",
-      data: response,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ msg: "Internal Server Error" });
-  }
+  const result = await promoRepo.createPromo(req.body);
+  res.status(result.statusCode).send(result);
 };
 const drop = async (req, res) => {
-  try {
-    const result = await promoRepo.deletePromo(req.params);
-    res.status(200).json({ msg: "Data deleted from database" });
-  } catch (err) {
-    res.status(500).json({ msg: "Internal Server Error" });
-  }
+  const result = await promoRepo.deletePromo(req.params);
+  res.status(result.statusCode).send(result);
 };
 const edit = async (req, res) => {
-  try {
-    const response = await promoRepo.editPromo(req.body, req.params);
-    res.status(200).json({
-      msg: "Data has been updated",
-      data_id: response[1],
-      data: response[0],
-    });
-  } catch (err) {
-    res.status(500).json({ msg: "Internal Server Error" });
-  }
+  const result = await promoRepo.editPromo(req.body, req.params);
+  res.status(result.statusCode).send(result);
 };
 const get = async (req, res) => {
-  try {
-    const response = await promoRepo.getPromo(req.params);
-    res.status(200).json({
-      result: response.rows,
-    });
-  } catch (err) {
-    res.status(500).json({
-      msg: "Internal Server Error",
-    });
-  }
+  const result = await promoRepo.getPromo(req.query);
+  res.status(result.statusCode).send(result);
 };
 const promoControllers = {
   create,

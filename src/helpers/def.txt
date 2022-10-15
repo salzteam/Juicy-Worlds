@@ -1,4 +1,0 @@
-folder helpers berisikan fungsi utility
-- perbandingan value
-- generate query
-- generate response success / error
