@@ -1,4 +1,5 @@
 const transactionsRepo = require("../repo/transactions");
+const client = require("../config/redis");
 
 const create = async (req, res) => {
   const result = await transactionsRepo.transaction(req.body, req.userPayload);

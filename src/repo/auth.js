@@ -1,16 +1,20 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+var JWTR = require("jwt-redis").default;
 const postgreDb = require("../config/postgre");
 const response = require("../helpers/response");
 const {
   userLogin,
-  datareadyexsits,
   wrongData,
   systemError,
+  success,
+  unauthorized,
 } = require("../helpers/templateResponse");
+const client = require("../config/redis");
 
 const loginUser = (body) => {
   return new Promise((resolve, reject) => {
+    const jwtr = new JWTR(client);
     const { email, password } = body;
     const getPasswordByEmailQuery =
       "SELECT id, password, role FROM users WHERE email = $1";
@@ -31,36 +35,83 @@ const loginUser = (body) => {
             return resolve(wrongData());
           }
           if (!isSame) return resolve(wrongData());
-
           const payload = {
             user_id: response.rows[0].id,
             name: response.rows[0].name,
             role: response.rows[0].role,
             email,
           };
-          jwt.sign(
-            payload,
-            process.env.SECRET_KEY,
-            {
-              expiresIn: "1d",
+          jwtr
+            .sign(payload, process.env.SECRET_KEY, {
+              expiresIn: "5m",
               issuer: process.env.ISSUER,
-            },
-            (err, token) => {
-              if (err) {
-                console.log(err);
-                return resolve(systemError);
-              }
+            })
+            .then((token) => {
+              // Token verification
               const sendRespon = {
                 token: token,
                 email: payload.email,
               };
               return resolve(userLogin(sendRespon));
-            }
-          );
+            });
+          // jwt.sign(
+          //   payload,
+          //   process.env.SECRET_KEY,
+          //   {
+          //     expiresIn: "1d",
+          //     issuer: process.env.ISSUER,
+          //   },
+          //   (err, token) => {
+          //     if (err) {
+          //       console.log(err.message);
+          //       return resolve(systemError);
+          //     }
+          //     client.set(String(payload.user_id), token);
+          //     const sendRespon = {
+          //       token: token,
+          //       email: payload.email,
+          //     };
+          //     return resolve(userLogin(sendRespon));
+          //   }
+          // );
         });
       }
     );
   });
 };
 
-module.exports = { loginUser };
+const logoutUser = (token) => {
+  return new Promise((resolve, reject) => {
+    const jwtr = new JWTR(client);
+    jwtr.destroy(token.jti).then((res) => {
+      if (!res) resolve(unauthorized());
+      resolve(success("Success logout account"));
+    });
+  });
+};
+
+// const logoutUser = (token) => {
+//   return new Promise((resolve, reject) => {
+//     const userId = token.user_id;
+//     client.connect().then((ress) => {
+//       client
+//         .get(String(userId))
+//         .then((result) => {
+//           console.log(result);
+//           if (tokens == token) {
+//             client.DEL(String(userId)).then((resultt) => {
+//               console.log(resultt);
+//               client.quit();
+//               return resolve(success());
+//             });
+//           }
+//           return resolve(systemError);
+//         })
+//         .catch((err) => {
+//           console.log(err);
+//         });
+//     });
+//   });
+// };
+
+module.exports = { loginUser, logoutUser };

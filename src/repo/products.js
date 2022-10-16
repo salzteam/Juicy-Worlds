@@ -7,6 +7,7 @@ const {
   created,
 } = require("../helpers/templateResponse");
 const deleteFile = require("../helpers/deletefile");
+const client = require("../config/redis");
 
 const createProducts = (body, file) => {
   return new Promise((resolve, reject) => {
@@ -56,12 +57,19 @@ const deleteProducts = (params) => {
 
 const editProducts = (body, params, file) => {
   return new Promise((resolve, reject) => {
+    const { nameProduct, priceProduct, categoryproduct } = body;
     let query = "update products set ";
     const values = [];
     let imageProduct = "/images/" + file.filename || null;
-    if (file && file.fieldname == "image") {
-      query += `image = '${imageProduct}', `;
-      console.log(query);
+    if (!nameProduct && !priceProduct && !categoryproduct) {
+      if (file && file.fieldname == "image") {
+        query += `displaypicture = '${imageProduct}',updated_at = now() where user_id = $1`;
+        values.push(params.id);
+      }
+    } else {
+      if (file && file.fieldname == "image") {
+        query += `displaypicture = '${imageProduct}',`;
+      }
     }
     Object.keys(body).forEach((key, idx, array) => {
       if (idx === array.length - 1) {
@@ -153,7 +161,13 @@ const getProducts = (queryParams) => {
       queryLimit = query + ` limit $1 offset $2`;
       values.push(limit, offset);
     }
+    const datas = client.get("dataProducts").then((result) => {
+      const dataValue = result;
+      console.log(dataValue);
+    });
     postgreDb.query(query, (err, getData) => {
+      let dataProducts = JSON.stringify(getData);
+      client.set(String("dataProducts"), dataProducts).then();
       postgreDb.query(queryLimit, values, (err, result) => {
         if (err) {
           console.log(err);

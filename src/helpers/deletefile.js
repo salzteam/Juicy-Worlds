@@ -5,7 +5,6 @@ const deleteFile = (filePath) => {
     if (err) {
       console.log(err);
     }
-    console.log(`${filePath} berhasil dihapus`);
   });
 };
 

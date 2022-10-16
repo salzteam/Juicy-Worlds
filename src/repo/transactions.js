@@ -278,8 +278,6 @@ const historyTransactions = (queryParams, token) => {
         let resNext = null;
         let resPrev = null;
         const dataNext = Math.ceil(getData.rowCount / limit);
-        console.log(getData.rowCount);
-        console.log(start);
         if (start <= getData.rowCount) {
           next = page + 1;
         }

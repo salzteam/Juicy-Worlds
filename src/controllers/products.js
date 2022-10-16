@@ -1,4 +1,5 @@
 const productsRepo = require("../repo/products");
+const client = require("../config/redis");
 
 const create = async (req, res) => {
   console.log(req.file.filename);
