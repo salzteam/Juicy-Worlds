@@ -27,7 +27,6 @@ const transaction = (body, token) => {
       client.query("BEGIN", (err) => {
         if (shouldAbort(err)) return;
         const {
-          user_id,
           fee,
           payment,
           delivery,
@@ -46,7 +45,7 @@ const transaction = (body, token) => {
             "insert into transactions (user_id, tax, payment_id, delivery_id, promo_id, notes, address, status_id) values ($1,$2,$3,$4,$5,$6,$7,'1') RETURNING id";
           client.query(
             queryText,
-            [user_id, fee, payment, delivery, promo_id, notes, address],
+            [token.user_id, fee, payment, delivery, promo_id, notes, address],
             (err, res) => {
               if (shouldAbort(err)) return;
               const insertPivot =
@@ -63,7 +62,7 @@ const transaction = (body, token) => {
                       resolve(systemError());
                     }
                     const ress = {
-                      id: valuUser,
+                      id_transactions: valuUser,
                       tax: fee,
                       payment: payment,
                       delivery: product_id,
@@ -201,8 +200,6 @@ const getTransactions = (queryParams) => {
         let resNext = null;
         let resPrev = null;
         const dataNext = Math.ceil(getData.rowCount / limit);
-        console.log(getData.rowCount);
-        console.log(start);
         if (start <= getData.rowCount) {
           next = page + 1;
         }

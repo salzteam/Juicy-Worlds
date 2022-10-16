@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-var JWTR = require("jwt-redis").default;
+const JWTR = require("jwt-redis").default;
 const postgreDb = require("../config/postgre");
 const response = require("../helpers/response");
 const {
