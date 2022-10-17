@@ -138,11 +138,15 @@ const editPorfile = (body, token, file) => {
     postgreDb.query(getData, [userId], (err, resData) => {
       if (err) {
         console.log(err);
-        deleteFile(file.path);
+        if (file) {
+          deleteFile(file.path);
+        }
         return resolve(systemError());
       }
       if (resData.rows.length < 1) {
-        deleteFile(file.path);
+        if (file) {
+          deleteFile(file.path);
+        }
         return resolve(notFound());
       }
       Object.keys(body).forEach((key, idx, array) => {
@@ -154,7 +158,9 @@ const editPorfile = (body, token, file) => {
           body[key] == resData.rows[0].adress ||
           body[key] == resData.rows[0].gender
         ) {
-          deleteFile(file.path);
+          if (file) {
+            deleteFile(file.path);
+          }
           return resolve(
             custMsg(
               "The data you want to change is not allowed to be the same as the previous data"
@@ -179,7 +185,9 @@ const editPorfile = (body, token, file) => {
         })
         .catch((err) => {
           console.log(err);
-          deleteFile(file.path);
+          if (file) {
+            deleteFile(file.path);
+          }
           resolve(systemError());
         });
     });

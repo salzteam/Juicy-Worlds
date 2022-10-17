@@ -12,7 +12,6 @@ const client = require("../config/redis");
 const createProducts = (body, file) => {
   return new Promise((resolve, reject) => {
     let { nameProduct, priceProduct, categoryproduct } = body;
-    console.log(file);
     let image = null;
     if (file) {
       image = "/images/" + file.filename;
@@ -174,13 +173,7 @@ const getProducts = (queryParams) => {
       queryLimit = query + ` limit $1 offset $2`;
       values.push(limit, offset);
     }
-    const datas = client.get("dataProducts").then((result) => {
-      const dataValue = result;
-      console.log(dataValue);
-    });
     postgreDb.query(query, (err, getData) => {
-      let dataProducts = JSON.stringify(getData);
-      client.set(String("dataProducts"), dataProducts).then();
       postgreDb.query(queryLimit, values, (err, result) => {
         if (err) {
           console.log(err);
