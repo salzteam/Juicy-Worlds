@@ -12,12 +12,15 @@ const client = require("../config/redis");
 const createProducts = (body, file) => {
   return new Promise((resolve, reject) => {
     let { nameProduct, priceProduct, categoryproduct } = body;
-    let image = "/images/" + file.filename || null;
+    console.log(file);
+    let image = null;
+    if (file) {
+      image = "/images/" + file.filename;
+    }
     let rescategory = "";
     if (categoryproduct.toLowerCase() === "foods") rescategory = 1;
     if (categoryproduct.toLowerCase() === "coffee") rescategory = 2;
     if (categoryproduct.toLowerCase() === "non coffee") rescategory = 3;
-    if (image == "" || !image) image = null;
     const query =
       "insert into products (product_name, price, category_id, image) values ($1,$2,$3,$4) RETURNING id";
     postgreDb.query(
@@ -57,18 +60,21 @@ const deleteProducts = (params) => {
 
 const editProducts = (body, params, file) => {
   return new Promise((resolve, reject) => {
-    const { nameProduct, priceProduct, categoryproduct } = body;
+    const { product_name, price, category_id } = body;
     let query = "update products set ";
     const values = [];
-    let imageProduct = "/images/" + file.filename || null;
-    if (!nameProduct && !priceProduct && !categoryproduct) {
-      if (file && file.fieldname == "image") {
-        query += `displaypicture = '${imageProduct}',updated_at = now() where user_id = $1`;
-        values.push(params.id);
-      }
-    } else {
-      if (file && file.fieldname == "image") {
-        query += `displaypicture = '${imageProduct}',`;
+    let imageProduct = "";
+    if (file) {
+      imageProduct = "/images/" + file.filename;
+      if (!product_name && !price && !category_id) {
+        if (file && file.fieldname == "image") {
+          query += `image = '${imageProduct}',updated_at = now() where id = $1`;
+          values.push(params.id);
+        }
+      } else {
+        if (file && file.fieldname == "image") {
+          query += `image = '${imageProduct}',`;
+        }
       }
     }
     Object.keys(body).forEach((key, idx, array) => {
@@ -82,16 +88,23 @@ const editProducts = (body, params, file) => {
       query += `${key} = $${idx + 1},`;
       values.push(body[key]);
     });
-    console.log(query);
     postgreDb
       .query(query, values)
       .then((response) => {
-        const sendRespon = {
-          data_id: body,
-          data: params.id,
-          image: imageProduct,
-        };
-        resolve(success(sendRespon));
+        if (file) {
+          const sendRespon = {
+            data_id: params.id,
+            data: body,
+            image: imageProduct,
+          };
+          return resolve(success(sendRespon));
+        } else {
+          const sendRespon = {
+            data_id: params.id,
+            data: body,
+          };
+          return resolve(success(sendRespon));
+        }
       })
       .catch((err) => {
         console.log(err);

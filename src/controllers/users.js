@@ -13,7 +13,6 @@ const createProfile = async (req, res) => {
   res.status(result.statusCode).send(result);
 };
 const editProfile = async (req, res) => {
-  console.log(req.body);
   const result = await usersRepo.editPorfile(
     req.body,
     req.userPayload,

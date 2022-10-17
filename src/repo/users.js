@@ -63,11 +63,11 @@ const createProfile = (body, token, file) => {
     postgreDb.query(getData, [userId], (err, resData) => {
       if (err) {
         console.log(err);
-        deleteFile(file.path);
+        if (file) deleteFile(file.path);
         return resolve(systemError());
       }
       if (resData.rows.length > 0) {
-        deleteFile(file.path);
+        if (file) deleteFile(file.path);
         return resolve(datareadyexsits());
       }
       const query =
@@ -87,7 +87,7 @@ const createProfile = (body, token, file) => {
         (err, response) => {
           if (err) {
             console.log(err);
-            deleteFile(file.path);
+            if (file) deleteFile(file.path);
             return resolve(systemError());
           }
           const sendResponse = {
@@ -113,22 +113,25 @@ const editPorfile = (body, token, file) => {
     let query = "update userdata set ";
     const values = [];
     const userId = token.user_id;
-    let imageProduct = "/images/" + file.filename || null;
-    if (
-      !display_name &&
-      !firstname &&
-      !lastname &&
-      !date_of_birth &&
-      !adress &&
-      !gender
-    ) {
-      if (file && file.fieldname == "image") {
-        query += `displaypicture = '${imageProduct}',updated_at = now() where user_id = $1`;
-        values.push(userId);
-      }
-    } else {
-      if (file && file.fieldname == "image") {
-        query += `displaypicture = '${imageProduct}',`;
+    let imageProduct = "";
+    if (file) {
+      imageProduct = "/images/" + file.filename;
+      if (
+        !display_name &&
+        !firstname &&
+        !lastname &&
+        !date_of_birth &&
+        !adress &&
+        !gender
+      ) {
+        if (file && file.fieldname == "image") {
+          query += `displaypicture = '${imageProduct}',updated_at = now() where user_id = $1`;
+          values.push(userId);
+        }
+      } else {
+        if (file && file.fieldname == "image") {
+          query += `displaypicture = '${imageProduct}',`;
+        }
       }
     }
     const getData = "select * from userdata where user_id = $1";
@@ -158,9 +161,7 @@ const editPorfile = (body, token, file) => {
             )
           );
         }
-        console.log(key);
         if (key == "image") key = "displaypicture";
-        console.log(key);
         if (idx === array.length - 1) {
           query += `${key} = $${idx + 1},updated_at = now() where user_id = $${
             idx + 2
@@ -171,7 +172,6 @@ const editPorfile = (body, token, file) => {
         query += `${key} = $${idx + 1},`;
         values.push(body[key]);
       });
-      console.log(query);
       postgreDb
         .query(query, values)
         .then((response) => {

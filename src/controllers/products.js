@@ -2,7 +2,6 @@ const productsRepo = require("../repo/products");
 const client = require("../config/redis");
 
 const create = async (req, res) => {
-  console.log(req.file.filename);
   const result = await productsRepo.createProducts(req.body, req.file);
   res.status(result.statusCode).send(result);
 };
@@ -11,7 +10,6 @@ const drop = async (req, res) => {
   res.status(result.statusCode).send(result);
 };
 const edit = async (req, res) => {
-  console.log(req.file);
   const result = await productsRepo.editProducts(
     req.body,
     req.params,
