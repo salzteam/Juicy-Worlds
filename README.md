@@ -53,7 +53,7 @@ $ cd Juicy-Worlds
 
 1. Install file using [WINDOWS](#Windows-Installation) OR [LINUX](Linux-Installation)
 
-2. Add .env file at root folder on config, and add following
+2. Add .env file at root folder, and add following
 
 ```sh
 PORT = 'YOUR_PORT'
