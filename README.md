@@ -23,6 +23,8 @@ _Juicy-Worlds is a hangout place for millennials who are looking for reference a
   - [Windows](#windows-installation)
   - [Linux](#linux-installation)
 - [How to run](#How-to-run)
+- [Route](#Route)
+- [Documentation Postman](#documentaion-postman)
 
 ## 𓆙 Requirement
 
@@ -98,8 +100,6 @@ $ npm run dev
 | /api/promo/edit/:id          |     `PATCH`      | Promo        | Edit Promo                            |
 | /api/promo/delete/:id        |     `DELETE`     | Promo        | Delete Promo                          |
 
-<BR>
-<BR>
 ## 𓆙 Documentation Postman
 
 Click here [POSTMAN](https://documenter.getpostman.com/view/23707233/2s83ziMNko)
