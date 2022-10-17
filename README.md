@@ -24,7 +24,7 @@ _Juicy-Worlds is a hangout place for millennials who are looking for reference a
   - [Linux](#linux-installation)
 - [How to run](#How-to-run)
 - [Route](#Route)
-- [Documentation Postman](#documentaion-postman)
+- [Documentation Postman](#𓆙-Documentation-Postman)
 
 ## 𓆙 Requirement
 
