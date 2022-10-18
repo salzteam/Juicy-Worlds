@@ -42,6 +42,8 @@ const deletePromo = (params) => {
 };
 const editPromo = (body, params) => {
   return new Promise((resolve, reject) => {
+    console.log(body);
+    console.log(params);
     let query = "update promos set ";
     const values = [];
     Object.keys(body).forEach((key, idx, array) => {
@@ -72,7 +74,7 @@ const editPromo = (body, params) => {
 };
 const getPromo = (Params) => {
   return new Promise((resolve, reject) => {
-    let link = "http://localhost:8080/api/v1/promo?";
+    let link = `${process.env.PORT_PAGINASI}api/v1/promo?`;
     let query = `select pr.code, pr.discount, p.product_name, p.price, c.category_name from promos pr left join products p on pr.product_id = p.id join categories c on p.category_id = c.id`;
     let queryLimit = "";
     if (Params.search) {

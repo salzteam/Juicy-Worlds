@@ -1,19 +1,31 @@
 const express = require("express");
-
 const productsRouter = express.Router();
 const validate = require("../middlewares/validate");
 const isLogin = require("../middlewares/isLogin");
 const isAllowed = require("../middlewares/allowedRole");
-const uploadImage = require("../middlewares/upload");
 const { create, drop, edit, get } = require("../controllers/products");
-const upload = uploadImage.single("image");
+const multer = require("multer");
+const uploadImage = require("../middlewares/upload");
+function uploadFile(req, res, next) {
+  const upload = uploadImage.single("image");
+  upload(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      console.log(err.code);
+      return res.status(415).json({ responseCode: 415, msg: err.code });
+    } else if (err) {
+      console.log(err.message);
+      return res.status(415).json({ responseCode: 415, msg: err.message });
+    }
+    next();
+  });
+}
 
 productsRouter.post(
   "/",
   isLogin(),
   isAllowed("admin"),
   validate.body("nameProduct", "priceProduct", "categoryproduct"),
-  upload,
+  uploadFile,
   validate.img(),
   create
 );
@@ -30,7 +42,7 @@ productsRouter.patch(
   isAllowed("admin"),
   validate.params("id"),
   validate.body("product_name", "price", "category_id"),
-  upload,
+  uploadFile,
   validate.img(),
   edit
 );

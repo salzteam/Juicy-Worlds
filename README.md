@@ -16,13 +16,15 @@ _Juicy-Worlds is a hangout place for millennials who are looking for reference a
 ## 𓆙 Table of Contents
 
 - [About Juicy Worlds](#about-Juicy-Worlds)
-  - [Understanding the concept of juicy worlds](#What-is-JuicyWorlds?)
-- [Table of Contents](#Table-of-Contents)
-- [Requirement](#requirement)
+  - [Understanding the concept of juicy worlds](#**What-is-JuicyWorlds?**)
+- [Table of Contents](#𓆙-Table-of-Contents)
+- [Requirement](#𓆙-Requirement)
 - [Installation](#)
-  - [Windows](#windows-installation)
-  - [Linux](#linux-installation)
-- [How to run](#How-to-run)
+  - [Windows](#𓆙-Windows-Installation)
+  - [Linux](#𓆙_Linux_Installation)
+- [How to run](#𓆙-How-to-run)
+- [Route](#𓆙-Documentation-Postman)
+- [Documentation Postman](#𓆙-Documentation-Postman)
 
 ## 𓆙 Requirement
 
@@ -57,6 +59,7 @@ $ cd Juicy-Worlds
 
 ```sh
 PORT = 'YOUR_PORT'
+PORT_PAGINASI = 'YOUR_PORT_PAGINASI'
 DB_HOST_DEV = 'YOUR_DB_HOST'
 DB_USER_DEV = 'YOUR_DB_USER'
 DB_PASS_DEV = 'YOUR_DB_DEV'
@@ -106,3 +109,4 @@ Click here [POSTMAN](https://documenter.getpostman.com/view/23707233/2s83ziMNko)
 <BR>
 
 <h1 align="center"> THANK FOR YOUR ATTENTION </h1>
+```

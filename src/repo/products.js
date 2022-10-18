@@ -28,7 +28,9 @@ const createProducts = (body, file) => {
       (err, queryResult) => {
         if (err) {
           console.log(err);
-          deleteFile(file.path);
+          if (file) {
+            deleteFile(file.path);
+          }
           return resolve(systemError());
         }
         const sendRespone = {
@@ -107,7 +109,9 @@ const editProducts = (body, params, file) => {
       })
       .catch((err) => {
         console.log(err);
-        deleteFile(file.path);
+        if (file) {
+          deleteFile(file.path);
+        }
         resolve(systemError());
       });
   });
@@ -115,7 +119,7 @@ const editProducts = (body, params, file) => {
 
 const getProducts = (queryParams) => {
   return new Promise((resolve, reject) => {
-    let link = "http://localhost:8080/api/v1/products?";
+    let link = `${process.env.PORT_PAGINASI}api/v1/products?`;
     let query = `select p.id, p.product_name, p.price, c.category_name, p.image from products p left join categories c on p.category_id = c.id`;
     let queryLimit = "";
     if (queryParams.search) {

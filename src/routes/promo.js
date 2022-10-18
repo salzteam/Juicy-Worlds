@@ -14,9 +14,8 @@ promoRouter.post(
 );
 promoRouter.patch(
   "/edit/:id",
-  isAllowed("admin"),
   isLogin(),
-  validate.params("id"),
+  isAllowed("admin"),
   validate.body("code", "discount", "product_id"),
   edit
 );

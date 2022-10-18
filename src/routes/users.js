@@ -4,8 +4,21 @@ const usersRouter = express.Router();
 const validate = require("../middlewares/validate");
 const isLogin = require("../middlewares/isLogin");
 const allowedRole = require("../middlewares/allowedRole");
+const multer = require("multer");
 const uploadImage = require("../middlewares/upload");
-const upload = uploadImage.single("image");
+function uploadFile(req, res, next) {
+  const upload = uploadImage.single("image");
+  upload(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      console.log(err.code);
+      return res.status(415).json({ responseCode: 415, msg: err.code });
+    } else if (err) {
+      console.log(err.message);
+      return res.status(415).json({ responseCode: 415, msg: err.message });
+    }
+    next();
+  });
+}
 
 const {
   createAccount,
@@ -31,7 +44,7 @@ usersRouter.post(
     "adress",
     "gender"
   ),
-  upload,
+  uploadFile,
   validate.img(),
   createProfile
 );
@@ -46,7 +59,7 @@ usersRouter.patch(
     "adress",
     "gender"
   ),
-  upload,
+  uploadFile,
   validate.img(),
   editProfile
 );

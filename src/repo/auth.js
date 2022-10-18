@@ -52,6 +52,7 @@ const loginUser = (body) => {
                 token: token,
                 email: payload.email,
               };
+              console.log(token);
               return resolve(userLogin(sendRespon));
             });
           // jwt.sign(
@@ -83,6 +84,7 @@ const loginUser = (body) => {
 const logoutUser = (token) => {
   return new Promise((resolve, reject) => {
     const jwtr = new JWTR(client);
+    console.log(token);
     jwtr.destroy(token.jti).then((res) => {
       if (!res) resolve(unauthorized());
       resolve(success("Success logout account"));

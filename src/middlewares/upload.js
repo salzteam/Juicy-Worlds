@@ -16,17 +16,17 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    const fileSize = parseInt(req.headers["content-length"]);
     if (
       file.mimetype == "image/png" ||
       file.mimetype == "image/jpg" ||
-      (file.mimetype == "image/jpeg" && fileSize < 5e6)
+      file.mimetype == "image/jpeg"
     ) {
       cb(null, true);
     } else {
-      return cb(new Error("Invalid mime type"));
+      return cb(new Error("Invalid file type"));
     }
   },
+  limits: { fileSize: 5e6 },
 });
 
 module.exports = upload;
