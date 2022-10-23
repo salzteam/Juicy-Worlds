@@ -128,10 +128,10 @@ const getProducts = (queryParams) => {
     }
     if (queryParams.filter) {
       if (queryParams.search) {
-        query += ` and lower(c.category_name) like lower('%${queryParams.filter}%')`;
+        query += ` and lower(c.category_name) like lower('${queryParams.filter}')`;
         link += `filter=${queryParams.filter}&`;
       }
-      query += ` where lower(c.category_name) like lower ('%${queryParams.filter}%')`;
+      query += ` where lower(c.category_name) like lower ('${queryParams.filter}')`;
       link += `filter=${queryParams.filter}&`;
     }
     if (queryParams.sortby == "newest") {
@@ -176,6 +176,8 @@ const getProducts = (queryParams) => {
       let offset = (page - 1) * limit;
       queryLimit = query + ` limit $1 offset $2`;
       values.push(limit, offset);
+    } else {
+      queryLimit = query;
     }
     postgreDb.query(query, (err, getData) => {
       postgreDb.query(queryLimit, values, (err, result) => {
@@ -184,32 +186,40 @@ const getProducts = (queryParams) => {
           return resolve(systemError());
         }
         if (result.rows.length == 0) return resolve(notFound());
-        let page = parseInt(queryParams.page);
-        let limit = parseInt(queryParams.limit);
-        let start = (page - 1) * limit;
-        let end = page * limit;
-        let next = "";
-        let prev = "";
         let resNext = null;
         let resPrev = null;
-        const dataNext = Math.ceil(getData.rowCount / limit);
-        if (start <= getData.rowCount) {
-          next = page + 1;
-        }
-        if (end > 0) {
-          prev = page - 1;
-        }
-        if (parseInt(next) <= parseInt(dataNext)) {
-          resNext = `${link}page=${next}&limit=${limit}`;
-        }
-        if (parseInt(prev) !== 0) {
-          resPrev = `${link}page=${prev}&limit=${limit}`;
+        if (queryParams.page && queryParams.limit) {
+          let page = parseInt(queryParams.page);
+          let limit = parseInt(queryParams.limit);
+          let start = (page - 1) * limit;
+          let end = page * limit;
+          let dataNext = Math.ceil(getData.rowCount / limit);
+          if (start <= getData.rowCount) {
+            next = page + 1;
+          }
+          if (end > 0) {
+            prev = page - 1;
+          }
+          if (parseInt(next) <= parseInt(dataNext)) {
+            resNext = `${link}page=${next}&limit=${limit}`;
+          }
+          if (parseInt(prev) !== 0) {
+            resPrev = `${link}page=${prev}&limit=${limit}`;
+          }
+          let sendResponse = {
+            dataCount: getData.rowCount,
+            next: resNext,
+            prev: resPrev,
+            totalPage: dataNext,
+            data: result.rows,
+          };
+          return resolve(success(sendResponse));
         }
         let sendResponse = {
-          dataCount: getData.rowCount,
+          dataCount: getData.rows.length,
           next: resNext,
           prev: resPrev,
-          totalPage: Math.ceil(getData.rowCount / limit),
+          totalPage: null,
           data: result.rows,
         };
         return resolve(success(sendResponse));

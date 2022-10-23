@@ -52,7 +52,6 @@ const loginUser = (body) => {
                 token: token,
                 email: payload.email,
               };
-              console.log(token);
               return resolve(userLogin(sendRespon));
             });
           // jwt.sign(

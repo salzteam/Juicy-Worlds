@@ -9,6 +9,7 @@ const {
   emailreadyexsits,
   datareadyexsits,
   custMsg,
+  phonealreadyexsits,
 } = require("../helpers/templateResponse");
 const deleteFile = require("../helpers/deletefile");
 
@@ -16,34 +17,41 @@ const createUsers = (body) => {
   return new Promise((resolve, reject) => {
     const { email, password, phone } = body;
     const validasiEmail = `select email from users where email like $1`;
+    const validasiPhone = `select phone from users where phone like $1`;
     postgreDb.query(validasiEmail, [email], (err, resEmail) => {
       if (err) return resolve(systemError());
       if (resEmail.rows.length > 0) {
         return resolve(emailreadyexsits());
       }
-      bcrypt.hash(password, 10, (err, hashedPassword) => {
-        if (err) {
-          console.log(err);
-          return resolve(systemError());
+      postgreDb.query(validasiPhone, [phone], (err, resPhone) => {
+        if (err) return resolve(systemError());
+        if (resPhone.rows.length > 0) {
+          return resolve(phonealreadyexsits());
         }
-        const query =
-          "INSERT INTO users (email, password, phone, role) VALUES ($1, $2, $3, 'users') RETURNING id";
-        const values = [email, hashedPassword, phone];
-        postgreDb.query(query, values, (err, result) => {
+        bcrypt.hash(password, 10, (err, hashedPassword) => {
           if (err) {
             console.log(err);
             return resolve(systemError());
           }
-          const sendResponse = {
-            msg: "Register Success",
-            data: {
-              ...result.rows[0],
-              email: body.email,
-              name: body.name,
-              phone: body.phone,
-            },
-          };
-          return resolve(created(sendResponse));
+          const query =
+            "INSERT INTO users (email, password, phone, role) VALUES ($1, $2, $3, 'users') RETURNING id";
+          const values = [email, hashedPassword, phone];
+          postgreDb.query(query, values, (err, result) => {
+            if (err) {
+              console.log(err);
+              return resolve(systemError());
+            }
+            const sendResponse = {
+              msg: "Register Success",
+              data: {
+                ...result.rows[0],
+                email: body.email,
+                name: body.name,
+                phone: body.phone,
+              },
+            };
+            return resolve(created(sendResponse));
+          });
         });
       });
     });

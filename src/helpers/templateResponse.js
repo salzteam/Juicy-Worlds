@@ -19,6 +19,12 @@ exports.emailreadyexsits = () => {
     this.msgList.EMAIL_ALREADY_EXIST
   );
 };
+exports.phonealreadyexsits = () => {
+  return this.templateResponse(
+    this.responseCode.PHONE_ALREADY_EXIST,
+    this.msgList.PHONE_ALREADY_EXIST
+  );
+};
 exports.datareadyexsits = () => {
   return this.templateResponse(
     this.responseCode.DATA_ALREADY_EXIST,
@@ -52,7 +58,7 @@ exports.created = (data) => {
 };
 exports.notFound = () => {
   return this.templateResponse(
-    this.responseCode.BADREQUEST,
+    this.responseCode.NOT_FOUND,
     this.msgList.NOT_FOUND
   );
 };
@@ -73,6 +79,7 @@ exports.systemError = (error) => {
 };
 
 exports.responseCode = {
+  NOT_FOUND: 404,
   BADREQUEST: 400,
   OK: 200,
   CREATED: 201,
@@ -80,6 +87,7 @@ exports.responseCode = {
   FORBIDDEN: 403,
   INTERNAL_SERVER_ERROR: 500,
   EMAIL_ALREADY_EXIST: 400,
+  PHONE_ALREADY_EXIST: 400,
   DATA_ALREADY_EXIST: 400,
   USER_LOGIN: 200,
 };
@@ -95,6 +103,7 @@ exports.msgList = {
   INVALID_TOKEN: "invalid_token",
   NO_TOKEN_PROVIDED: "no_token_provided",
   EMAIL_ALREADY_EXIST: "email already exists",
+  PHONE_ALREADY_EXIST: "phone already exists",
   DATA_ALREADY_EXIST: "data already exists",
   USER_LOGIN: "login success",
   WRONG_DATA: "Email/Password is Wrong",
