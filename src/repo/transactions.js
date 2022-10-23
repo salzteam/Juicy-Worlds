@@ -323,12 +323,12 @@ const historyTransactions = (queryParams, token) => {
       link += `sort=${queryParams.sort}&`;
     }
     // PAGINASI
-    let values = [];
+    let values = [token.user_id];
     if (queryParams.page && queryParams.limit) {
       let page = parseInt(queryParams.page);
       let limit = parseInt(queryParams.limit);
       let offset = (page - 1) * limit;
-      queryLimit = query + ` limit $1 offset $2`;
+      queryLimit = query + ` limit $2 offset $3`;
       values.push(limit, offset);
     } else {
       queryLimit = query;
