@@ -1,4 +1,3 @@
-const postgreDb = require("../config/postgre");
 const response = require("../helpers/response");
 const {
   success,
@@ -7,7 +6,7 @@ const {
   created,
 } = require("../helpers/templateResponse");
 const deleteFile = require("../helpers/deletefile");
-const client = require("../config/redis");
+const { postgreDb, port_paginasi } = require("../config/postgre");
 
 const createProducts = (body, file) => {
   return new Promise((resolve, reject) => {
@@ -119,7 +118,7 @@ const editProducts = (body, params, file) => {
 
 const getProducts = (queryParams) => {
   return new Promise((resolve, reject) => {
-    let link = `${process.env.PORT_PAGINASI}api/v1/products?`;
+    let link = `${port_paginasi}api/v1/products?`;
     let query = `select p.id, p.product_name, p.price, c.category_name, p.image from products p left join categories c on p.category_id = c.id`;
     let queryLimit = "";
     if (queryParams.search) {
@@ -207,7 +206,7 @@ const getProducts = (queryParams) => {
             resPrev = `${link}page=${prev}&limit=${limit}`;
           }
           let sendResponse = {
-            dataCount: getData.rowCount,
+            dataCount: getData.rows.length,
             next: resNext,
             prev: resPrev,
             totalPage: dataNext,

@@ -1,4 +1,3 @@
-const postgreDb = require("../config/postgre");
 const bcrypt = require("bcrypt");
 const response = require("../helpers/response");
 const {
@@ -12,6 +11,7 @@ const {
   phonealreadyexsits,
 } = require("../helpers/templateResponse");
 const deleteFile = require("../helpers/deletefile");
+const { postgreDb } = require("../config/postgre");
 
 const createUsers = (body) => {
   return new Promise((resolve, reject) => {

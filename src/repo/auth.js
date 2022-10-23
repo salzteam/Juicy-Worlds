@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const JWTR = require("jwt-redis").default;
-const postgreDb = require("../config/postgre");
+const { postgreDb, port_paginasi } = require("../config/postgre");
 const response = require("../helpers/response");
 const {
   userLogin,
@@ -83,7 +83,6 @@ const loginUser = (body) => {
 const logoutUser = (token) => {
   return new Promise((resolve, reject) => {
     const jwtr = new JWTR(client);
-    console.log(token);
     jwtr.destroy(token.jti).then((res) => {
       if (!res) resolve(unauthorized());
       resolve(success("Success logout account"));
