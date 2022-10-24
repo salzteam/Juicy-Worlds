@@ -6,7 +6,7 @@ const {
   created,
 } = require("../helpers/templateResponse");
 const deleteFile = require("../helpers/deletefile");
-const { postgreDb, port_paginasi } = require("../config/postgre");
+const postgreDb = require("../config/postgre");
 
 const createProducts = (body, file) => {
   return new Promise((resolve, reject) => {
@@ -116,9 +116,9 @@ const editProducts = (body, params, file) => {
   });
 };
 
-const getProducts = (queryParams) => {
+const getProducts = (queryParams, hostApi) => {
   return new Promise((resolve, reject) => {
-    let link = `${port_paginasi}api/v1/products?`;
+    let link = `${hostApi}/api/v1/products?`;
     let query = `select p.id, p.product_name, p.price, c.category_name, p.image from products p left join categories c on p.category_id = c.id`;
     let queryLimit = "";
     if (queryParams.search) {

@@ -5,7 +5,7 @@ const {
   systemError,
   created,
 } = require("../helpers/templateResponse");
-const { postgreDb, port_paginasi } = require("../config/postgre");
+const postgreDb = require("../config/postgre");
 
 const transaction = (body, token) => {
   return new Promise((resolve, reject) => {
@@ -150,9 +150,9 @@ const editTransactions = (body, params) => {
   });
 };
 
-const getTransactions = (queryParams) => {
+const getTransactions = (queryParams, hostApi) => {
   return new Promise((resolve, reject) => {
-    let link = `${port_paginasi}api/v1/transactions?`;
+    let link = `${hostApi}/api/v1/transactions?`;
     let query =
       "select tpm.transaction_id, ud.display_name, p.product_name, p.price, ct.category_name, t.tax, pm.method, d.method, d.shipping, d.minimum_distance, d.charge_cost, ps.code, ps.discount, t.notes, st.status_name, s.size, s.cost, tpm.qty, tpm.subtotal from transactions_product_sizes tpm left join transactions t on tpm.transaction_id = t.id join userdata ud on t.user_id = ud.user_id join users u on ud.user_id = u.id join products p on tpm.product_id = p.id join categories ct on p.category_id = ct.id join payments pm on t.payment_id = pm.id join status st on t.status_id = st.id  join deliveries d on t.delivery_id = d.id FULL OUTER join promos ps on t.promo_id = ps.id join sizes s on tpm.size_id = s.id";
     let queryLimit = "";
@@ -300,9 +300,9 @@ const getTransactions = (queryParams) => {
 //   });
 // };
 
-const historyTransactions = (queryParams, token) => {
+const historyTransactions = (queryParams, token, hostApi) => {
   return new Promise((resolve, reject) => {
-    let link = `${port_paginasi}api/v1/transactions/history/:id?`;
+    let link = `${hostApi}/api/v1/transactions/history/:id?`;
     let query =
       "select tpm.transaction_id, ud.display_name, p.product_name, p.price, ct.category_name, t.tax, pm.method, d.method, d.shipping, d.minimum_distance, d.charge_cost, ps.code, ps.discount, t.notes, st.status_name, s.size, s.cost, tpm.qty, tpm.subtotal from transactions_product_sizes tpm left join transactions t on tpm.transaction_id = t.id join userdata ud on t.user_id = ud.user_id join users u on ud.user_id = u.id join products p on tpm.product_id = p.id join categories ct on p.category_id = ct.id join payments pm on t.payment_id = pm.id join status st on t.status_id = st.id  join deliveries d on t.delivery_id = d.id FULL OUTER join promos ps on t.promo_id = ps.id join sizes s on tpm.size_id = s.id where u.id = $1";
     let queryLimit = "";

@@ -18,7 +18,8 @@ const edit = async (req, res) => {
   res.status(result.statusCode).send(result);
 };
 const get = async (req, res) => {
-  const result = await productsRepo.getProducts(req.query);
+  const hostApi = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
+  const result = await productsRepo.getProducts(req.query, hostApi);
   res.status(result.statusCode).send(result);
 };
 const productsControllers = {

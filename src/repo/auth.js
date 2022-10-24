@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const JWTR = require("jwt-redis").default;
-const { postgreDb, port_paginasi } = require("../config/postgre");
+const postgreDb = require("../config/postgre");
 const response = require("../helpers/response");
 const {
   userLogin,

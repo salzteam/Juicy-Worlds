@@ -13,7 +13,8 @@ const edit = async (req, res) => {
   res.status(result.statusCode).send(result);
 };
 const get = async (req, res) => {
-  const result = await promoRepo.getPromo(req.query);
+  const hostApi = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
+  const result = await promoRepo.getPromo(req.query, hostApi);
   res.status(result.statusCode).send(result);
 };
 const promoControllers = {

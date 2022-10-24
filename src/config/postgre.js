@@ -11,7 +11,7 @@ const {
 const { Pool } = require("pg");
 // const { Pool } = pg;
 
-const postgreDb = new Pool({
+const db = new Pool({
   host: DB_HOST_DEV,
   user: DB_USER_DEV,
   database: DB_NAME_DEV,
@@ -19,6 +19,4 @@ const postgreDb = new Pool({
   port: DB_PORT,
 });
 
-const port_paginasi = "http://localhost:8080/";
-
-module.exports = { postgreDb, port_paginasi };
+module.exports = db;

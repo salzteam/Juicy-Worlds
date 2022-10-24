@@ -15,13 +15,16 @@ const edit = async (req, res) => {
 };
 
 const get = async (req, res) => {
-  const result = await transactionsRepo.getTransactions(req.query);
+  const hostApi = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
+  const result = await transactionsRepo.getTransactions(req.query, hostApi);
   res.status(result.statusCode).send(result);
 };
 const getHistory = async (req, res) => {
+  const hostApi = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
   const result = await transactionsRepo.historyTransactions(
     req.query,
-    req.userPayload
+    req.userPayload,
+    hostApi
   );
   res.status(result.statusCode).send(result);
 };

@@ -5,7 +5,7 @@ const {
   systemError,
   created,
 } = require("../helpers/templateResponse");
-const { postgreDb, port_paginasi } = require("../config/postgre");
+const postgreDb = require("../config/postgre");
 
 const createPromo = (body) => {
   return new Promise((resolve, reject) => {
@@ -137,9 +137,9 @@ const editPromo = (body, params) => {
 //   });
 // };
 
-const getPromo = (queryParams) => {
+const getPromo = (queryParams, hostApi) => {
   return new Promise((resolve, reject) => {
-    let link = `${port_paginasi}api/v1/promo?`;
+    let link = `${hostApi}/api/v1/promo?`;
     let query = `select pr.code, pr.discount, p.product_name, p.price, c.category_name from promos pr left join products p on pr.product_id = p.id join categories c on p.category_id = c.id`;
     let queryLimit = "";
     if (queryParams.search) {
