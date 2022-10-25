@@ -4,14 +4,14 @@ const createAccount = async (req, res) => {
   const result = await usersRepo.createUsers(req.body);
   res.status(result.statusCode).send(result);
 };
-const createProfile = async (req, res) => {
-  const result = await usersRepo.createProfile(
-    req.body,
-    req.userPayload,
-    req.file
-  );
-  res.status(result.statusCode).send(result);
-};
+// const createProfile = async (req, res) => {
+//   const result = await usersRepo.createProfile(
+//     req.body,
+//     req.userPayload,
+//     req.file
+//   );
+//   res.status(result.statusCode).send(result);
+// };
 const editProfile = async (req, res) => {
   const result = await usersRepo.editPorfile(
     req.body,
@@ -31,7 +31,6 @@ const getUser = async (req, res) => {
 };
 const usersControllers = {
   createAccount,
-  createProfile,
   editPwd,
   editProfile,
   getUser,

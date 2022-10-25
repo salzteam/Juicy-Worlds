@@ -41,20 +41,8 @@ transactionsRouter.patch(
   "/edit/:id",
   isLogin(),
   isAllowed("admin"),
-  validate.body(
-    "user_id",
-    "fee",
-    "payment",
-    "delivery",
-    "promo_id",
-    "notes",
-    "status",
-    "product_id",
-    "size",
-    "qty",
-    "subtotal",
-    "status_id"
-  ),
+  validate.params("id"),
+  validate.body("status_id"),
   edit
 );
 transactionsRouter.get(

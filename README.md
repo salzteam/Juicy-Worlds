@@ -59,7 +59,6 @@ $ cd Juicy-Worlds
 
 ```sh
 PORT = 'YOUR_PORT'
-PORT_PAGINASI = 'YOUR_PORT_PAGINASI'
 DB_HOST_DEV = 'YOUR_DB_HOST'
 DB_USER_DEV = 'YOUR_DB_USER'
 DB_PASS_DEV = 'YOUR_DB_DEV'
@@ -86,7 +85,6 @@ $ npm run dev
 | /api/users                   |      `GET`       | User         | Get Users (admin)                     |
 | /api/users/register          |      `POST`      | Auth         | Register                              |
 | /api/users/account           |      `POST`      | User         | Change Password                       |
-| /api/users/profile           |     `PATCH`      | User         | Create Profile                        |
 | /api/users/profile/edit      |     `PATCH`      | User         | Change Profile                        |
 | /api/transactions            |      `GET`       | Transactions | History transactios all users( admin) |
 | /api/transactions/history    |      `GET`       | Transactions | History Transaction                   |

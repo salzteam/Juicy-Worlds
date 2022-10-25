@@ -17,13 +17,14 @@ const createPromo = (body) => {
         console.log(err);
         return resolve(systemError());
       }
-      const ress = {
-        id: queryResult.rows[0].id,
-        code: code,
-        discount: discount + "%",
-        product_id: product_id,
-      };
-      resolve(created(ress));
+      resolve(
+        created({
+          id: queryResult.rows[0].id,
+          code: code,
+          discount: discount + "%",
+          product_id: product_id,
+        })
+      );
     });
   });
 };
@@ -46,25 +47,26 @@ const editPromo = (body, params) => {
     console.log(params);
     let query = "update promos set ";
     const values = [];
+    let data = {
+      id: params.id,
+    };
     Object.keys(body).forEach((key, idx, array) => {
       if (idx === array.length - 1) {
         query += `${key} = $${idx + 1}, updated_at = now() where id = $${
           idx + 2
         }`;
         values.push(body[key], params.id);
+        data[key] = body[key];
         return;
       }
       query += `${key} = $${idx + 1},`;
       values.push(body[key]);
+      data[key] = body[key];
     });
     postgreDb
       .query(query, values)
       .then((response) => {
-        const sendResponse = {
-          data_id: params.id,
-          detailData: body,
-        };
-        resolve(success(sendResponse));
+        resolve(success(data));
       })
       .catch((err) => {
         console.log(err);

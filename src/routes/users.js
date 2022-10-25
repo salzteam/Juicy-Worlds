@@ -24,7 +24,6 @@ const {
   createAccount,
   getUser,
   editPwd,
-  createProfile,
   editProfile,
 } = require("../controllers/users");
 
@@ -33,21 +32,21 @@ usersRouter.post(
   validate.email("email", "password", "phone"),
   createAccount
 );
-usersRouter.post(
-  "/profile",
-  isLogin(),
-  validate.body(
-    "displayName",
-    "firstname",
-    "lastname",
-    "date_of_birth",
-    "adress",
-    "gender"
-  ),
-  uploadFile,
-  validate.img(),
-  createProfile
-);
+// usersRouter.post(
+//   "/profile",
+//   isLogin(),
+//   validate.body(
+//     "displayName",
+//     "firstname",
+//     "lastname",
+//     "date_of_birth",
+//     "adress",
+//     "gender"
+//   ),
+//   uploadFile,
+//   validate.img(),
+//   createProfile
+// );
 usersRouter.patch(
   "/profile/edit",
   isLogin(),

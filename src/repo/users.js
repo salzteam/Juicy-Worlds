@@ -41,16 +41,30 @@ const createUsers = (body) => {
               console.log(err);
               return resolve(systemError());
             }
-            const sendResponse = {
-              msg: "Register Success",
-              data: {
-                ...result.rows[0],
-                email: body.email,
-                name: body.name,
-                phone: body.phone,
-              },
-            };
-            return resolve(created(sendResponse));
+            postgreDb.query(
+              "INSERT INTO userdata (user_id, display_name, firstname, lastname, date_of_birth, adress, gender, displaypicture) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+              [result.rows[0].id, null, null, null, null, null, null, null],
+              (err, response) => {
+                if (err) {
+                  console.log(err);
+                  postgreDb.query(
+                    "delete from users where id = $1",
+                    [result.rows[0].id],
+                    (err, res) => {
+                      if (err) console.log(err);
+                    }
+                  );
+                  return resolve(systemError());
+                }
+                return resolve(
+                  created({
+                    ...result.rows[0],
+                    email: body.email,
+                    phone: body.phone,
+                  })
+                );
+              }
+            );
           });
         });
       });
@@ -58,61 +72,61 @@ const createUsers = (body) => {
   });
 };
 
-const createProfile = (body, token, file) => {
-  return new Promise((resolve, reject) => {
-    const { displayName, firstname, lastname, date_of_birth, adress, gender } =
-      body;
-    const userId = token.user_id;
-    let image = null;
-    if (file) {
-      image = "/images/" + file.filename;
-    }
-    const getData = "select user_id from userdata where user_id = $1";
-    postgreDb.query(getData, [userId], (err, resData) => {
-      if (err) {
-        console.log(err);
-        if (file) deleteFile(file.path);
-        return resolve(systemError());
-      }
-      if (resData.rows.length > 0) {
-        if (file) deleteFile(file.path);
-        return resolve(datareadyexsits());
-      }
-      const query =
-        "INSERT INTO userdata (user_id, display_name, firstname, lastname, date_of_birth, adress, gender, displaypicture) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)";
-      postgreDb.query(
-        query,
-        [
-          userId,
-          displayName,
-          firstname,
-          lastname,
-          date_of_birth,
-          adress,
-          gender,
-          image,
-        ],
-        (err, response) => {
-          if (err) {
-            console.log(err);
-            if (file) deleteFile(file.path);
-            return resolve(systemError());
-          }
-          const sendResponse = {
-            displayName: body.displayName,
-            firstname: body.firstname,
-            lastname: body.lastname,
-            date_of_birth: body.date_of_birth,
-            address: body.adress,
-            gender: body.gender,
-            displayPicture: image,
-          };
-          resolve(created(sendResponse));
-        }
-      );
-    });
-  });
-};
+// const createProfile = (body, token, file) => {
+//   return new Promise((resolve, reject) => {
+//     const { displayName, firstname, lastname, date_of_birth, adress, gender } =
+//       body;
+//     const userId = token.user_id;
+//     let image = null;
+//     if (file) {
+//       image = "/images/" + file.filename;
+//     }
+//     const getData = "select user_id from userdata where user_id = $1";
+//     postgreDb.query(getData, [userId], (err, resData) => {
+//       if (err) {
+//         console.log(err);
+//         if (file) deleteFile(file.path);
+//         return resolve(systemError());
+//       }
+//       if (resData.rows.length > 0) {
+//         if (file) deleteFile(file.path);
+//         return resolve(datareadyexsits());
+//       }
+//       const query =
+//         "INSERT INTO userdata (user_id, display_name, firstname, lastname, date_of_birth, adress, gender, displaypicture) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)";
+//       postgreDb.query(
+//         query,
+//         [
+//           userId,
+//           displayName,
+//           firstname,
+//           lastname,
+//           date_of_birth,
+//           adress,
+//           gender,
+//           image,
+//         ],
+//         (err, response) => {
+//           if (err) {
+//             console.log(err);
+//             if (file) deleteFile(file.path);
+//             return resolve(systemError());
+//           }
+//           const sendResponse = {
+//             displayName: body.displayName,
+//             firstname: body.firstname,
+//             lastname: body.lastname,
+//             date_of_birth: body.date_of_birth,
+//             address: body.adress,
+//             gender: body.gender,
+//             displayPicture: image,
+//           };
+//           resolve(created(sendResponse));
+//         }
+//       );
+//     });
+//   });
+// };
 
 const editPorfile = (body, token, file) => {
   return new Promise((resolve, reject) => {
@@ -122,6 +136,7 @@ const editPorfile = (body, token, file) => {
     const values = [];
     const userId = token.user_id;
     let imageProduct = "";
+    let data = {};
     if (file) {
       imageProduct = "/images/" + file.filename;
       if (
@@ -135,10 +150,12 @@ const editPorfile = (body, token, file) => {
         if (file && file.fieldname == "image") {
           query += `displaypicture = '${imageProduct}',updated_at = now() where user_id = $1`;
           values.push(userId);
+          data["image"] = imageProduct;
         }
       } else {
         if (file && file.fieldname == "image") {
           query += `displaypicture = '${imageProduct}',`;
+          data["image"] = imageProduct;
         }
       }
     }
@@ -181,15 +198,18 @@ const editPorfile = (body, token, file) => {
             idx + 2
           }`;
           values.push(body[key], userId);
+          data[key] = body[key];
           return;
         }
         query += `${key} = $${idx + 1},`;
         values.push(body[key]);
+        data[key] = body[key];
       });
+      console.log(query);
       postgreDb
         .query(query, values)
         .then((response) => {
-          resolve(success(body));
+          resolve(success(data));
         })
         .catch((err) => {
           console.log(err);
@@ -262,7 +282,6 @@ const getUsersDatas = () => {
 };
 const usersRepo = {
   createUsers,
-  createProfile,
   getUsersDatas,
   editPassword,
   editPorfile,

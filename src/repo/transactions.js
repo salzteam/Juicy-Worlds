@@ -61,21 +61,22 @@ const transaction = (body, token) => {
                       console.error("Error committing transaction", err.stack);
                       resolve(systemError());
                     }
-                    const ress = {
-                      id_transactions: valuUser,
-                      tax: fee,
-                      payment: payment,
-                      delivery: product_id,
-                      promo_id: promo_id,
-                      notes: notes,
-                      status: "pending",
-                      address: address,
-                      product_id: product_id,
-                      size: size,
-                      qty: qty,
-                      subtotal: subtotal,
-                    };
-                    resolve(created(ress));
+                    resolve(
+                      created({
+                        id_transactions: valuUser,
+                        tax: fee,
+                        payment: payment,
+                        delivery: product_id,
+                        promo_id: promo_id,
+                        notes: notes,
+                        status: "pending",
+                        address: address,
+                        product_id: product_id,
+                        size: size,
+                        qty: qty,
+                        subtotal: subtotal,
+                      })
+                    );
                     done();
                   });
                 }
@@ -112,35 +113,20 @@ const editTransactions = (body, params) => {
     Object.keys(body).forEach((key) => {
       let query = "";
       let values = [body[key], params.id];
-      if (
-        key == "transaction_id" ||
-        key == "product_id" ||
-        key == "size_id" ||
-        key == "qty" ||
-        key == "subtotal"
-      )
-        query += `update transactions_product_sizes set ${key} = $1 where transaction_id = $2`;
-      else if (
-        key == "user_id" ||
-        key == "tax" ||
-        key == "payment_id" ||
-        key == "delivery_id" ||
-        key == "promo_id" ||
-        key == "notes" ||
-        key == "status_id"
-      )
-        if (key == "status_id") {
-          if (body[key] == "1") status = "PENDING";
-          if (body[key] == "2") status = "PAID";
-          if (body[key] == "3") status = "DONE";
-          if (body[key] == "4") status = "CANCEL";
-          body["status_id"] = status;
-        }
+      let data = {
+        id: params.id,
+      };
+      if (body[key] == "1") status = "PENDING";
+      if (body[key] == "2") status = "PAID";
+      if (body[key] == "3") status = "DONE";
+      if (body[key] == "4") status = "CANCEL";
+      body["status_id"] = status;
+      data[key] = body[key];
       query += `update transactions set ${key} = $1,updated_at = now() where id = $2`;
       postgreDb
         .query(query, values)
         .then((response) => {
-          resolve(success(body));
+          resolve(success(data));
         })
         .catch((err) => {
           console.log(err);

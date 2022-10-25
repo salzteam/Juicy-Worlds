@@ -23,7 +23,7 @@ module.exports = {
       for (let key of sanitizedKey) {
         Object.assign(newParams, { [key]: params[key] });
       }
-      req.body = newParams;
+      req.params = newParams;
       next();
     };
   },
