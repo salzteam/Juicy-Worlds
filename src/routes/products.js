@@ -11,7 +11,10 @@ function uploadFile(req, res, next) {
   upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {
       console.log(err.code);
-      return res.status(415).json({ responseCode: 415, msg: err.code });
+      return res.status(415).json({
+        responseCode: 415,
+        msg: "File too large, image must be 2MB or lower",
+      });
     } else if (err) {
       console.log(err.message);
       return res.status(415).json({ responseCode: 415, msg: err.message });
