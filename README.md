@@ -81,8 +81,8 @@ $ npm run dev
 
 | Endpoint                     |      Method      | Info         | Remark                                |
 | ---------------------------- | :--------------: | :----------- | :------------------------------------ |
-| /api/auth                    | `DELETE` `POST`  | Auth         | Login, Logout                         |
-| /api/users                   |      `GET`       | User         | Get Users (admin)                     |
+| /api/auth                    | `DELETE` `POST` `PATCH`  | Auth         | Login, Logout, Reset Password                       |
+| /api/users                   |      `GET`       | User         | Get Users (admin)                        |
 | /api/users/register          |      `POST`      | Auth         | Register                              |
 | /api/users/account           |      `POST`      | User         | Change Password                       |
 | /api/users/profile/edit      |     `PATCH`      | User         | Change Profile                        |

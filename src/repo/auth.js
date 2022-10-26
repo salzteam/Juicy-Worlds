@@ -8,6 +8,7 @@ const {
   wrongData,
   systemError,
   success,
+  custMsg,
   unauthorized,
 } = require("../helpers/templateResponse");
 const client = require("../config/redis");
@@ -90,6 +91,75 @@ const logoutUser = (token) => {
   });
 };
 
+const resetPassword = (body, hostApi) => {
+  return new Promise((resolve, reject) => {
+    const { code, new_password, email } = body;
+    if (email) {
+      if (!code && !new_password) {
+        let queryEmail = "select email from users where email = $1";
+        postgreDb.query(queryEmail, [email], (err, resEmail) => {
+          if (err) {
+            console.log(err.message);
+            resolve(systemError());
+          }
+          if (resEmail.rows.length == 0) resolve(wrongData());
+          const digits = "0123456789";
+          let OTP = "";
+          for (let i = 0; i < 6; i++) {
+            OTP += digits[Math.floor(Math.random() * 10)];
+          }
+          client.get(email).then((results) => {
+            if (results) return resolve(custMsg("Code already send to email!"));
+            client
+              .set(email, OTP, {
+                EX: 120,
+                NX: true,
+              })
+              .then(() => {
+                resolve(success("Link OTP send to email"));
+              })
+              .then(() => {
+                client
+                  .set(OTP, email, {
+                    EX: 120,
+                    NX: true,
+                  })
+                  .then();
+              });
+          });
+          // });
+        });
+      }
+    }
+    if (!email) {
+      if (code && new_password) {
+        client.get(code).then((results) => {
+          if (!results) return resolve(custMsg("Code OTP Wrong!"));
+          bcrypt.hash(new_password, 10, (err, newHashedPassword) => {
+            if (err) {
+              console.log(err);
+              return resolve(systemError());
+            }
+            const editPwdQuery =
+              "UPDATE users SET password = $1, updated_at = now() WHERE email = $2";
+            const editPwdValues = [newHashedPassword, results];
+            postgreDb.query(editPwdQuery, editPwdValues, (err, response) => {
+              if (err) {
+                console.log(err);
+                return resolve(systemError());
+              }
+              resolve(success(null));
+              client.del(code).then(() => {
+                return client.del(results).then();
+              });
+            });
+          });
+        });
+      }
+    }
+  });
+};
+
 // const logoutUser = (token) => {
 //   return new Promise((resolve, reject) => {
 //     const userId = token.user_id;
@@ -114,4 +184,4 @@ const logoutUser = (token) => {
 //   });
 // };
 
-module.exports = { loginUser, logoutUser };
+module.exports = { loginUser, logoutUser, resetPassword };

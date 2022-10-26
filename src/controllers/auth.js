@@ -9,4 +9,8 @@ const logout = async (req, res) => {
   const result = await authRepo.logoutUser(req.userPayload);
   res.status(result.statusCode).send(result);
 };
-module.exports = { login, logout };
+const forgot = async (req, res) => {
+  const result = await authRepo.resetPassword(req.body);
+  res.status(result.statusCode).send(result);
+};
+module.exports = { login, logout, forgot };
