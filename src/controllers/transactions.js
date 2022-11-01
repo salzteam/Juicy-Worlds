@@ -2,6 +2,7 @@ const transactionsRepo = require("../repo/transactions");
 const client = require("../config/redis");
 
 const create = async (req, res) => {
+  console.log(req.body);
   const result = await transactionsRepo.transaction(req.body, req.userPayload);
   res.status(result.statusCode).send(result);
 };
