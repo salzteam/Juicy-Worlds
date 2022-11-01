@@ -38,10 +38,10 @@ const transaction = (body, token) => {
           subtotal,
         } = body;
         if (fee == null) fee = 0;
-        if (payment == null) payment = 0;
+        if (payment == null) payment = 4;
         if (delivery == null) delivery = 0;
-        if (promo_id == null) promo_id = 0;
-        if (notes == null) notes = 0;
+        if (promo_id == null) promo_id = 999;
+        if (notes == null) notes = "-";
         if (product_id == null) product_id = 0;
         if (size == null) size = 0;
         if (qty == null) qty = 0;
