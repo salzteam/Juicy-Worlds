@@ -37,15 +37,15 @@ const transaction = (body, token) => {
           qty,
           subtotal,
         } = body;
-        if (fee == null) fee = null;
-        if (payment == null) payment = null;
-        if (delivery == null) delivery = null;
-        if (promo_id == null) promo_id = null;
-        if (notes == null) notes = null;
-        if (product_id == null) product_id = null;
-        if (size == null) size = null;
-        if (qty == null) qty = null;
-        if (subtotal == null) subtotal = null;
+        if (fee == null) fee = 0;
+        if (payment == null) payment = 0;
+        if (delivery == null) delivery = 0;
+        if (promo_id == null) promo_id = 0;
+        if (notes == null) notes = 0;
+        if (product_id == null) product_id = 0;
+        if (size == null) size = 0;
+        if (qty == null) qty = 0;
+        if (subtotal == null) subtotal = 0;
         console.log(delivery);
         const queryAddress = "SELECT adress from userdata where user_id = $1";
         client.query(queryAddress, [token.user_id], (err, resAddress) => {
