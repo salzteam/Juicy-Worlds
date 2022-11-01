@@ -39,12 +39,14 @@ const transaction = (body, token) => {
         } = body;
         if (fee == null) fee = null;
         if (payment == null) payment = null;
+        if (delivery == null) delivery = null;
         if (promo_id == null) promo_id = null;
         if (notes == null) notes = null;
         if (product_id == null) product_id = null;
         if (size == null) size = null;
         if (qty == null) qty = null;
         if (subtotal == null) subtotal = null;
+        console.log(delivery);
         const queryAddress = "SELECT adress from userdata where user_id = $1";
         client.query(queryAddress, [token.user_id], (err, resAddress) => {
           if (shouldAbort(err)) return;
@@ -63,30 +65,41 @@ const transaction = (body, token) => {
                 insertPivot,
                 [valuUser, product_id, size, qty, subtotal],
                 (err, res) => {
-                  if (shouldAbort(err)) return;
-                  client.query("COMMIT", (err) => {
-                    if (err) {
-                      console.error("Error committing transaction", err.stack);
-                      resolve(systemError());
+                  client.query(
+                    "select * from products where id = $1",
+                    [product_id],
+                    (err, rest) => {
+                      if (shouldAbort(err)) return;
+                      client.query("COMMIT", (err) => {
+                        if (err) {
+                          console.error(
+                            "Error committing transaction",
+                            err.stack
+                          );
+                          resolve(systemError());
+                        }
+                        resolve(
+                          created({
+                            id_transactions: valuUser,
+                            tax: fee,
+                            payment: payment,
+                            delivery: product_id,
+                            promo_id: promo_id,
+                            notes: notes,
+                            status: "pending",
+                            address: address,
+                            product_id: product_id,
+                            product_name: rest.rows[0].product_name,
+                            price: rest.rows[0].price,
+                            size: size,
+                            qty: qty,
+                            subtotal: subtotal,
+                          })
+                        );
+                        done();
+                      });
                     }
-                    resolve(
-                      created({
-                        id_transactions: valuUser,
-                        tax: fee,
-                        payment: payment,
-                        delivery: product_id,
-                        promo_id: promo_id,
-                        notes: notes,
-                        status: "pending",
-                        address: address,
-                        product_id: product_id,
-                        size: size,
-                        qty: qty,
-                        subtotal: subtotal,
-                      })
-                    );
-                    done();
-                  });
+                  );
                 }
               );
             }
