@@ -10,6 +10,7 @@ const {
   edit,
   get,
   getHistory,
+  getPending,
   // sort,
 } = require("../controllers/transactions");
 transactionsRouter.post(
@@ -57,6 +58,12 @@ transactionsRouter.get(
   isLogin(),
   validate.body("sort", "page", "limit"),
   getHistory
+);
+transactionsRouter.get(
+  "/history/pending",
+  isLogin(),
+  validate.body("sort", "page", "limit"),
+  getPending
 );
 // transactionsRouter.get("/history/sort/:id", sort);
 module.exports = transactionsRouter;

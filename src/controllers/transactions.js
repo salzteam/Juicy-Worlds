@@ -28,12 +28,17 @@ const getHistory = async (req, res) => {
   );
   res.status(result.statusCode).send(result);
 };
+const getPending = async (req, res) => {
+  const result = await transactionsRepo.getPending(req.query, req.userPayload);
+  res.status(result.statusCode).send(result);
+};
 const transactionsControllers = {
   create,
   drop,
   edit,
   get,
   getHistory,
+  getPending,
 };
 
 module.exports = transactionsControllers;
