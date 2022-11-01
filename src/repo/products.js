@@ -10,17 +10,17 @@ const postgreDb = require("../config/postgre");
 
 const createProducts = (body, file) => {
   return new Promise((resolve, reject) => {
-    let { nameProduct, priceProduct, categoryproduct } = body;
+    let { nameProduct, priceProduct, categoryproduct, description } = body;
     let image = null;
     if (file) {
-      image = "/images/" + file.filename;
+      image = file.url;
     }
     let rescategory = "";
     if (categoryproduct.toLowerCase() === "foods") rescategory = 1;
     if (categoryproduct.toLowerCase() === "coffee") rescategory = 2;
     if (categoryproduct.toLowerCase() === "non coffee") rescategory = 3;
     const query =
-      "insert into products (product_name, price, category_id, image) values ($1,$2,$3,$4) RETURNING id";
+      "insert into products (product_name, price, category_id, image, description) values ($1,$2,$3,$4,$5) RETURNING id";
     postgreDb.query(
       query,
       [nameProduct, priceProduct, rescategory, image],
@@ -38,6 +38,7 @@ const createProducts = (body, file) => {
             name: nameProduct,
             price: priceProduct,
             category: categoryproduct,
+            description: description,
             image: image,
           })
         );
@@ -58,10 +59,23 @@ const deleteProducts = (params) => {
     });
   });
 };
+const getbyid = (params) => {
+  return new Promise((resolve, reject) => {
+    const query =
+      "select p.id, p.product_name, p.price, c.category_name, p.image, p.description from products p left join categories c on p.category_id = c.id where p.id = $1";
+    postgreDb.query(query, [params.id], (err, result) => {
+      if (err) {
+        console.log(err);
+        return resolve(systemError());
+      }
+      resolve(success(result.rows));
+    });
+  });
+};
 
 const editProducts = (body, params, file) => {
   return new Promise((resolve, reject) => {
-    const { product_name, price, category_id } = body;
+    const { product_name, price, category_id, description } = body;
     let query = "update products set ";
     const values = [];
     let imageProduct = "";
@@ -69,15 +83,15 @@ const editProducts = (body, params, file) => {
       id: params.id,
     };
     if (file) {
-      imageProduct = "/images/" + file.filename;
+      imageProduct = file.url;
       if (!product_name && !price && !category_id) {
-        if (file && file.fieldname == "image") {
+        if (file && file.resource_type == "image") {
           query += `image = '${imageProduct}',updated_at = now() where id = $1`;
           values.push(params.id);
           data["image"] = imageProduct;
         }
       } else {
-        if (file && file.fieldname == "image") {
+        if (file && file.resource_type == "image") {
           query += `image = '${imageProduct}',`;
           data["image"] = imageProduct;
         }
@@ -118,7 +132,7 @@ const editProducts = (body, params, file) => {
 const getProducts = (queryParams, hostApi) => {
   return new Promise((resolve, reject) => {
     let link = `${hostApi}/api/v1/products?`;
-    let query = `select p.id, p.product_name, p.price, c.category_name, p.image from products p left join categories c on p.category_id = c.id`;
+    let query = `select p.id, p.product_name, p.price, c.category_name, p.image, p.description from products p left join categories c on p.category_id = c.id`;
     let queryLimit = "";
     if (queryParams.search) {
       query += ` where lower(p.product_name) like lower('%${queryParams.search}%')`;
@@ -231,6 +245,7 @@ const productsRepo = {
   deleteProducts,
   editProducts,
   getProducts,
+  getbyid,
 };
 
 module.exports = productsRepo;

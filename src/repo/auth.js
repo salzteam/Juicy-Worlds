@@ -44,7 +44,7 @@ const loginUser = (body) => {
           };
           jwtr
             .sign(payload, process.env.SECRET_KEY, {
-              expiresIn: "5m",
+              expiresIn: "1d",
               issuer: process.env.ISSUER,
             })
             .then((token) => {
@@ -52,6 +52,8 @@ const loginUser = (body) => {
               const sendRespon = {
                 token: token,
                 email: payload.email,
+                id: response.rows[0].id,
+                role: response.rows[0].role,
               };
               return resolve(userLogin(sendRespon));
             });

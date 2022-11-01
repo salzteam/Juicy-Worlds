@@ -3,30 +3,29 @@ const productsRouter = express.Router();
 const validate = require("../middlewares/validate");
 const isLogin = require("../middlewares/isLogin");
 const isAllowed = require("../middlewares/allowedRole");
-const { create, drop, edit, get } = require("../controllers/products");
-const multer = require("multer");
-const uploadImage = require("../middlewares/upload");
-function uploadFile(req, res, next) {
-  const upload = uploadImage.single("image");
-  upload(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      return res.status(415).json({
-        responseCode: 415,
-        msg: "File too large, image must be 2MB or lower",
-      });
-    } else if (err) {
-      return res.status(415).json({ responseCode: 415, msg: err.message });
-    }
-    next();
-  });
-}
+const { create, drop, edit, get, getid } = require("../controllers/products");
+const {
+  diskUpload,
+  memoryUpload,
+  errorHandler,
+} = require("../middlewares/upload");
+const productUpload = require("../middlewares/productUpload.js");
 
 productsRouter.post(
   "/",
   isLogin(),
   isAllowed("admin"),
-  validate.body("nameProduct", "priceProduct", "categoryproduct"),
-  uploadFile,
+  validate.body(
+    "nameProduct",
+    "priceProduct",
+    "categoryproduct",
+    "description"
+  ),
+  (req, res, next) =>
+    memoryUpload.single("image")(req, res, (err) => {
+      errorHandler(err, res, next);
+    }),
+  productUpload,
   validate.img(),
   create
 );
@@ -42,8 +41,12 @@ productsRouter.patch(
   isLogin(),
   isAllowed("admin"),
   validate.params("id"),
-  validate.body("product_name", "price", "category_id"),
-  uploadFile,
+  validate.body("product_name", "price", "category_id", "description"),
+  (req, res, next) =>
+    memoryUpload.single("image")(req, res, (err) => {
+      errorHandler(err, res, next);
+    }),
+  productUpload,
   validate.img(),
   edit
 );
@@ -60,4 +63,5 @@ productsRouter.get(
   ),
   get
 );
+productsRouter.get("/:id", validate.params("id"), getid);
 module.exports = productsRouter;

@@ -1,8 +1,11 @@
 {
-  "name": "fluffy-journey-web11",
+  "name": "JuicyWorlds",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "16.x"
+  },
   "scripts": {
     "start": "node index",
     "dev": "cls&&nodemon index"
@@ -13,7 +16,9 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
+    "cloudinary": "^1.32.0",
     "cors": "^2.8.5",
+    "datauri": "^4.1.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.1",
     "jsonwebtoken": "^8.5.1",
@@ -21,8 +26,7 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "pg": "^8.8.0",
-    "redis": "^4.3.1",
-    "validate-phone-number-node-js": "^0.0.1"
+    "redis": "^4.3.1"
   },
   "devDependencies": {
     "eslint": "^8.24.0",

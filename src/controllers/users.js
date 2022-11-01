@@ -29,11 +29,16 @@ const getUser = async (req, res) => {
   const result = await usersRepo.getUsersDatas();
   res.status(result.statusCode).send(result);
 };
+const getUserProfile = async (req, res) => {
+  const result = await usersRepo.getUsersProfile(req.userPayload);
+  res.status(result.statusCode).send(result);
+};
 const usersControllers = {
   createAccount,
   editPwd,
   editProfile,
   getUser,
+  getUserProfile,
 };
 
 module.exports = usersControllers;

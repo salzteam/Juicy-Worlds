@@ -138,7 +138,7 @@ const editPorfile = (body, token, file) => {
     let imageProduct = "";
     let data = {};
     if (file) {
-      imageProduct = "/images/" + file.filename;
+      imageProduct = file.url;
       if (
         !display_name &&
         !firstname &&
@@ -147,7 +147,7 @@ const editPorfile = (body, token, file) => {
         !adress &&
         !gender
       ) {
-        if (file && file.fieldname == "image") {
+        if (file && file.resource_type == "image") {
           query += `displaypicture = '${imageProduct}',updated_at = now() where user_id = $1`;
           values.push(userId);
           data["image"] = imageProduct;
@@ -259,6 +259,7 @@ const editPassword = (body, token) => {
     });
   });
 };
+
 const getUsersDatas = () => {
   return new Promise((resolve, reject) => {
     const query1 = "select id, email,phone,role from users";
@@ -281,11 +282,30 @@ const getUsersDatas = () => {
     });
   });
 };
+const getUsersProfile = (token) => {
+  return new Promise((resolve, reject) => {
+    const query = "select * from users where id = $1";
+    const query2 = "select * from userdata where user_id = $1";
+    postgreDb.query(query, [token.user_id], (err, users) => {
+      postgreDb.query(query2, [token.user_id], (err, profiles) => {
+        if (err) {
+          resolve(systemError());
+        }
+        const results = {
+          profileData: users.rows,
+          profileUser: profiles.rows,
+        };
+        resolve(success(results));
+      });
+    });
+  });
+};
 const usersRepo = {
   createUsers,
   getUsersDatas,
   editPassword,
   editPorfile,
+  getUsersProfile,
 };
 
 module.exports = usersRepo;

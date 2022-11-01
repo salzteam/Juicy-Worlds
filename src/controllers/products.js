@@ -22,11 +22,16 @@ const get = async (req, res) => {
   const result = await productsRepo.getProducts(req.query, hostApi);
   res.status(result.statusCode).send(result);
 };
+const getid = async (req, res) => {
+  const result = await productsRepo.getbyid(req.params);
+  res.status(result.statusCode).send(result);
+};
 const productsControllers = {
   create,
   drop,
   edit,
   get,
+  getid,
 };
 
 module.exports = productsControllers;

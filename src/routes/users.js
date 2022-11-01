@@ -4,28 +4,19 @@ const usersRouter = express.Router();
 const validate = require("../middlewares/validate");
 const isLogin = require("../middlewares/isLogin");
 const allowedRole = require("../middlewares/allowedRole");
-const multer = require("multer");
-const uploadImage = require("../middlewares/upload");
-function uploadFile(req, res, next) {
-  const upload = uploadImage.single("image");
-  upload(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      return res.status(415).json({
-        responseCode: 415,
-        msg: "File too large, image must be 2MB or lower",
-      });
-    } else if (err) {
-      return res.status(415).json({ responseCode: 415, msg: err.message });
-    }
-    next();
-  });
-}
+const {
+  diskUpload,
+  memoryUpload,
+  errorHandler,
+} = require("../middlewares/upload");
+const cloudinaryUploader = require("../middlewares/cloudinary");
 
 const {
   createAccount,
   getUser,
   editPwd,
   editProfile,
+  getUserProfile,
 } = require("../controllers/users");
 
 usersRouter.post(
@@ -59,7 +50,11 @@ usersRouter.patch(
     "adress",
     "gender"
   ),
-  uploadFile,
+  (req, res, next) =>
+    memoryUpload.single("image")(req, res, (err) => {
+      errorHandler(err, res, next);
+    }),
+  cloudinaryUploader,
   validate.img(),
   editProfile
 );
@@ -70,5 +65,6 @@ usersRouter.patch(
   editPwd
 );
 usersRouter.get("/", isLogin(), allowedRole("admin"), getUser);
+usersRouter.get("/:id", isLogin(), getUserProfile);
 
 module.exports = usersRouter;
