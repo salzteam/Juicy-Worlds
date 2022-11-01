@@ -69,35 +69,64 @@ const transaction = (body, token) => {
                     "select * from products where id = $1",
                     [product_id],
                     (err, rest) => {
-                      if (shouldAbort(err)) return;
-                      client.query("COMMIT", (err) => {
-                        if (err) {
-                          console.error(
-                            "Error committing transaction",
-                            err.stack
+                      client.query(
+                        "select * from sizes where id = $1",
+                        [size],
+                        (err, resSize) => {
+                          let discount = [];
+                          if (promo_id) {
+                            client.query(
+                              "select * from promos where product_id = $1",
+                              [product_id],
+                              (err, resPromo) => {
+                                discount.push(resPromo.rows[0]);
+                              }
+                            );
+                          }
+                          console.log(discount);
+                          client.query(
+                            "select * from deliveries where id = $1",
+                            [delivery],
+                            (err, resDeliv) => {
+                              if (shouldAbort(err)) return;
+                              client.query("COMMIT", (err) => {
+                                if (err) {
+                                  console.error(
+                                    "Error committing transaction",
+                                    err.stack
+                                  );
+                                  resolve(systemError());
+                                }
+                                resolve(
+                                  created({
+                                    id_transactions: valuUser,
+                                    tax: fee,
+                                    payment: payment,
+                                    delivery_id: product_id,
+                                    shipping: resDeliv.rows[0].shipping,
+                                    minimun_distance:
+                                      resDeliv.rows[0].minimun_distance,
+                                    charge_cost: resDeliv.rows[0].charge_cost,
+                                    promo_id: promo_id,
+                                    discount: discount[2],
+                                    notes: notes,
+                                    status: "pending",
+                                    address: address,
+                                    product_id: product_id,
+                                    product_name: rest.rows[0].product_name,
+                                    price: rest.rows[0].price,
+                                    size: size,
+                                    cost_sizes: resSize.rows[0].cost,
+                                    qty: qty,
+                                    subtotal: subtotal,
+                                  })
+                                );
+                                done();
+                              });
+                            }
                           );
-                          resolve(systemError());
                         }
-                        resolve(
-                          created({
-                            id_transactions: valuUser,
-                            tax: fee,
-                            payment: payment,
-                            delivery: product_id,
-                            promo_id: promo_id,
-                            notes: notes,
-                            status: "pending",
-                            address: address,
-                            product_id: product_id,
-                            product_name: rest.rows[0].product_name,
-                            price: rest.rows[0].price,
-                            size: size,
-                            qty: qty,
-                            subtotal: subtotal,
-                          })
-                        );
-                        done();
-                      });
+                      );
                     }
                   );
                 }
