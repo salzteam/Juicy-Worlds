@@ -195,6 +195,34 @@ const editTransactions = (body, params) => {
     });
   });
 };
+const payment = (body, params) => {
+  return new Promise((resolve, reject) => {
+    let status = "";
+    Object.keys(body).forEach((key) => {
+      let query = "";
+      let values = [body[key], params.id];
+      let data = {
+        id: params.id,
+      };
+      if (body[key] == "1") status = "PENDING";
+      if (body[key] == "2") status = "PAID";
+      if (body[key] == "3") status = "DONE";
+      if (body[key] == "4") status = "CANCEL";
+      body["status_id"] = status;
+      data[key] = body[key];
+      query += `update transactions set ${key} = $1,updated_at = now() where id = $2`;
+      postgreDb
+        .query(query, values)
+        .then((response) => {
+          resolve(success(data));
+        })
+        .catch((err) => {
+          console.log(err);
+          resolve(systemError());
+        });
+    });
+  });
+};
 
 const getTransactions = (queryParams, hostApi) => {
   return new Promise((resolve, reject) => {
@@ -445,6 +473,7 @@ const transactionsRepo = {
   getTransactions,
   historyTransactions,
   getPending,
+  payment,
   // sortingHistory,
 };
 

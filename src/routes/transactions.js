@@ -11,6 +11,7 @@ const {
   get,
   getHistory,
   getPending,
+  payment,
   // sort,
 } = require("../controllers/transactions");
 transactionsRouter.post(
@@ -45,6 +46,12 @@ transactionsRouter.patch(
   validate.params("id"),
   validate.body("status_id"),
   edit
+);
+transactionsRouter.patch(
+  "/payment/:id",
+  isLogin(),
+  validate.body("status_id", "payment_id"),
+  payment
 );
 transactionsRouter.get(
   "/",

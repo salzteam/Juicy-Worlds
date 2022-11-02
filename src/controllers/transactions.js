@@ -14,6 +14,12 @@ const edit = async (req, res) => {
   const result = await transactionsRepo.editTransactions(req.body, req.params);
   res.status(result.statusCode).send(result);
 };
+const payment = async (req, res) => {
+  console.log(req.body);
+  console.log(req.params);
+  const result = await transactionsRepo.payment(req.body, req.params);
+  res.status(result.statusCode).send(result);
+};
 
 const get = async (req, res) => {
   const hostApi = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
@@ -40,6 +46,7 @@ const transactionsControllers = {
   get,
   getHistory,
   getPending,
+  payment,
 };
 
 module.exports = transactionsControllers;
