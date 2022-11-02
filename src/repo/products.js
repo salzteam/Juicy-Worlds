@@ -64,11 +64,23 @@ const getbyid = (params) => {
     const query =
       "select p.id, p.product_name, p.price, c.category_name, p.image, p.description from products p left join categories c on p.category_id = c.id where p.id = $1";
     postgreDb.query(query, [params.id], (err, result) => {
-      if (err) {
-        console.log(err);
-        return resolve(systemError());
-      }
-      resolve(success(result.rows));
+      postgreDb.query(
+        "select * from promos where product_id = $1",
+        [params.id],
+        (err, resultpromos) => {
+          if (err) {
+            console.log(err);
+            return resolve(systemError());
+          }
+          let dataPromo = 999;
+          if (resultpromos.rows.length > 0) dataPromo = resultpromos.rows[0];
+          const Response = {
+            dataProduct: result.rows,
+            dataPromo: dataPromo,
+          };
+          resolve(success(Response));
+        }
+      );
     });
   });
 };
