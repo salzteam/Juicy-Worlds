@@ -50,8 +50,9 @@ const transaction = (body, token) => {
         console.log(delivery);
         const queryAddress = "SELECT adress from userdata where user_id = $1";
         client.query(queryAddress, [token.user_id], (err, resAddress) => {
+          let address = " ";
           if (shouldAbort(err)) return;
-          const address = resAddress.rows[0].adress;
+          if (resAddress.rows[0].adress) address = resAddress.rows[0].adress;
           const queryText =
             "insert into transactions (user_id, tax, payment_id, delivery_id, promo_id, notes, address, status_id) values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id";
           client.query(
