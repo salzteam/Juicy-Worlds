@@ -75,9 +75,10 @@ const getbyid = (params) => {
           let dataPromo = 999;
           if (resultpromos.rows.length > 0) dataPromo = resultpromos.rows[0];
           const Response = {
-            dataProduct: result.rows,
+            dataProduct: result.rows["0"],
             dataPromo: dataPromo,
           };
+          console.log(result.rows);
           resolve(success(Response));
         }
       );
