@@ -36,6 +36,7 @@ const transaction = (body, token) => {
           size,
           qty,
           subtotal,
+          status_id,
         } = body;
         if (fee == null) fee = 0;
         if (payment == null) payment = 4;
@@ -43,21 +44,28 @@ const transaction = (body, token) => {
         if (promo_id == null) promo_id = 999;
         if (notes == null) notes = "-";
         if (product_id == null) product_id = 0;
-        if (size == "1") size = 0;
-        if (size == "2") size = 4000;
-        if (size == "3") size = 6000;
         if (qty == null) qty = 0;
         if (subtotal == null) subtotal = 0;
+        if (status_id == null) status_id = null;
         console.log(delivery);
         const queryAddress = "SELECT adress from userdata where user_id = $1";
         client.query(queryAddress, [token.user_id], (err, resAddress) => {
           if (shouldAbort(err)) return;
           const address = resAddress.rows[0].adress;
           const queryText =
-            "insert into transactions (user_id, tax, payment_id, delivery_id, promo_id, notes, address, status_id) values ($1,$2,$3,$4,$5,$6,$7,'1') RETURNING id";
+            "insert into transactions (user_id, tax, payment_id, delivery_id, promo_id, notes, address, status_id) values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id";
           client.query(
             queryText,
-            [token.user_id, fee, payment, delivery, promo_id, notes, address],
+            [
+              token.user_id,
+              fee,
+              payment,
+              delivery,
+              promo_id,
+              notes,
+              address,
+              status_id,
+            ],
             (err, res) => {
               if (shouldAbort(err)) return;
               const insertPivot =
