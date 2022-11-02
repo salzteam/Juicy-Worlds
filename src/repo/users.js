@@ -42,8 +42,8 @@ const createUsers = (body) => {
               return resolve(systemError());
             }
             postgreDb.query(
-              "INSERT INTO userdata (user_id, display_name, firstname, lastname, date_of_birth, adress, gender, displaypicture) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
-              [result.rows[0].id, null, null, null, null, null, null, null],
+              "INSERT INTO userdata (user_id, date_of_birth ,gender) VALUES ($1,$2,$3)",
+              [result.rows[0].id, null, null],
               (err, response) => {
                 if (err) {
                   console.log(err);
