@@ -46,7 +46,7 @@ const transaction = (body, token) => {
         if (product_id == null) product_id = 0;
         if (qty == null) qty = 0;
         if (subtotal == null) subtotal = 0;
-        if (status_id == null) status_id = null;
+        if (status_id == null) status_id = 1;
         console.log(delivery);
         const queryAddress = "SELECT adress from userdata where user_id = $1";
         client.query(queryAddress, [token.user_id], (err, resAddress) => {
