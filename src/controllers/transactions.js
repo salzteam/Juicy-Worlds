@@ -27,7 +27,7 @@ const get = async (req, res) => {
   res.status(result.statusCode).send(result);
 };
 const getHistory = async (req, res) => {
-  const hostApi = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
+  const hostApi = `${req.protocol}://${req.hostname}`;
   const result = await transactionsRepo.historyTransactions(
     req.query,
     req.userPayload,
