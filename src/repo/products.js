@@ -177,19 +177,19 @@ const getProducts = (queryParams, hostApi) => {
     }
     if (queryParams.transactions == "popular") {
       if (queryParams.filter) {
-        query = `select p.id, p.product_name, p.price, c.category_name, p.image, count(tpz.product_id) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id where lower(c.category_name) like lower ('%${queryParams.filter}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc`;
+        query = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id where lower(c.category_name) like lower ('%${queryParams.filter}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc`;
         link += `filter=${queryParams.filter}&transactions=${queryParams.transactions}&`;
       } else {
-        query = `select p.id, p.product_name, p.price, c.category_name, p.image, count(tpz.product_id) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc`;
+        query = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc`;
         link += `transactions=${queryParams.transactions}&`;
       }
     }
     if (queryParams.transactions == "unpopular") {
       if (queryParams.filter) {
-        query = `select p.id, p.product_name, p.price, c.category_name, p.image, count(tpz.product_id) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id where lower(c.category_name) like lower ('%${queryParams.filter}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold asc`;
+        query = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id where lower(c.category_name) like lower ('%${queryParams.filter}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold asc`;
         link += `filter=${queryParams.filter}&transactions=${queryParams.transactions}&`;
       } else {
-        query = `select p.id, p.product_name, p.price, c.category_name, p.image, count(tpz.product_id) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold asc`;
+        query = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold asc`;
         link += `transactions=${queryParams.transactions}&`;
       }
     }
