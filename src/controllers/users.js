@@ -20,6 +20,10 @@ const editProfile = async (req, res) => {
   );
   res.status(result.statusCode).send(result);
 };
+const editUser = async (req, res) => {
+  const result = await usersRepo.editUser(req.body, req.userPayload);
+  res.status(result.statusCode).send(result);
+};
 const editPwd = async (req, res) => {
   const result = await usersRepo.editPassword(req.body, req.userPayload);
   res.status(result.statusCode).send(result);
@@ -39,6 +43,7 @@ const usersControllers = {
   editProfile,
   getUser,
   getUserProfile,
+  editUser,
 };
 
 module.exports = usersControllers;

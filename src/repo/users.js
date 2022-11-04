@@ -221,6 +221,52 @@ const editPorfile = (body, token, file) => {
     });
   });
 };
+const editUser = (body, token) => {
+  return new Promise((resolve, reject) => {
+    const { email, phone } = body;
+    let query = "update userdata set ";
+    const validasiEmail = `select email from users where email like $1`;
+    const validasiPhone = `select phone from users where phone like $1`;
+    postgreDb.query(validasiEmail, [email], (err, resEmail) => {
+      if (err) return resolve(systemError());
+      if (resEmail.rows.length > 0) {
+        return resolve(emailreadyexsits());
+      }
+      postgreDb.query(validasiPhone, [phone], (err, resPhone) => {
+        if (err) return resolve(systemError());
+        if (resPhone.rows.length > 0) {
+          return resolve(phonealreadyexsits());
+        }
+        const values = [];
+        const userId = token.user_id;
+        let data = {};
+        Object.keys(body).forEach((key, idx, array) => {
+          if (idx === array.length - 1) {
+            query += `${key} = $${idx + 1},updated_at = now() where id = $${
+              idx + 2
+            }`;
+            values.push(body[key], userId);
+            data[key] = body[key];
+            return;
+          }
+          query += `${key} = $${idx + 1},`;
+          values.push(body[key]);
+          data[key] = body[key];
+        });
+        console.log(query);
+        postgreDb
+          .query(query, values)
+          .then((response) => {
+            resolve(success(data));
+          })
+          .catch((err) => {
+            console.log(err);
+            resolve(systemError());
+          });
+      });
+    });
+  });
+};
 
 const editPassword = (body, token) => {
   return new Promise((resolve, reject) => {
@@ -306,6 +352,7 @@ const usersRepo = {
   editPassword,
   editPorfile,
   getUsersProfile,
+  editUser,
 };
 
 module.exports = usersRepo;

@@ -17,6 +17,7 @@ const {
   editPwd,
   editProfile,
   getUserProfile,
+  editUser,
 } = require("../controllers/users");
 
 usersRouter.post(
@@ -57,6 +58,12 @@ usersRouter.patch(
   cloudinaryUploader,
   validate.img(),
   editProfile
+);
+usersRouter.patch(
+  "/profile/edit/user",
+  isLogin(),
+  validate.body("email", "phone"),
+  editUser
 );
 usersRouter.patch(
   "/account",
