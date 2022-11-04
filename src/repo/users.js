@@ -224,7 +224,7 @@ const editPorfile = (body, token, file) => {
 const editUser = (body, token) => {
   return new Promise((resolve, reject) => {
     const { email, phone } = body;
-    let query = "update userdata set ";
+    let query = "update users set ";
     const validasiEmail = `select email from users where email like $1`;
     const validasiPhone = `select phone from users where phone like $1`;
     postgreDb.query(validasiEmail, [email], (err, resEmail) => {

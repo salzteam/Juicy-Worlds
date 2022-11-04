@@ -60,7 +60,7 @@ usersRouter.patch(
   editProfile
 );
 usersRouter.patch(
-  "/profile/edit/user",
+  "/profile/edit/account",
   isLogin(),
   validate.body("email", "phone"),
   editUser
