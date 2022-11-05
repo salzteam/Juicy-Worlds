@@ -61,28 +61,26 @@ const deleteProducts = (params) => {
 };
 const getbyid = (params) => {
   return new Promise((resolve, reject) => {
-    const query =
-      "select p.id, p.product_name, p.price, c.category_name, p.image, p.description from products p left join categories c on p.category_id = c.id where p.id = $1";
-    postgreDb.query(query, [params.id], (err, result) => {
-      postgreDb.query(
-        "select * from promos where product_id = $1",
-        [params.id],
-        (err, resultpromos) => {
-          if (err) {
-            console.log(err);
-            return resolve(systemError());
-          }
-          let dataPromo = 999;
-          if (resultpromos.rows.length > 0) dataPromo = resultpromos.rows[0];
-          const Response = {
-            dataProduct: result.rows["0"],
-            dataPromo: dataPromo,
-          };
-          console.log(result.rows);
-          resolve(success(Response));
+    // const query =
+    //   "select p.id, p.product_name, p.price, c.category_name, p.image, p.description from products p left join categories c on p.category_id = c.id where p.id = $1";
+    // postgreDb.query(query, [params.id], (err, result) => {
+    postgreDb.query(
+      "select * from promos where product_id = $1",
+      [params.id],
+      (err, resultpromos) => {
+        if (err) {
+          console.log(err);
+          return resolve(systemError());
         }
-      );
-    });
+        let dataPromo = 999;
+        if (resultpromos.rows.length > 0) dataPromo = resultpromos.rows[0];
+        const Response = {
+          dataPromo: dataPromo,
+        };
+        console.log(result.rows);
+        resolve(success(Response));
+      }
+    );
   });
 };
 
@@ -189,7 +187,7 @@ const getProducts = (queryParams, hostApi) => {
         query = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id where lower(c.category_name) like lower ('%${queryParams.filter}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold asc`;
         link += `filter=${queryParams.filter}&transactions=${queryParams.transactions}&`;
       } else {
-        query = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold asc`;
+        query = `select p.id, p.product_name, p.price, c.category_name, p.image, p.description,COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold asc`;
         link += `transactions=${queryParams.transactions}&`;
       }
     }
