@@ -35,7 +35,6 @@ transactionsRouter.post(
 transactionsRouter.delete(
   "/delete/:id",
   isLogin(),
-  isAllowed("admin"),
   validate.params("id"),
   drop
 );
