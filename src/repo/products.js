@@ -19,6 +19,7 @@ const createProducts = (body, file) => {
     if (categoryproduct.toLowerCase() === "foods") rescategory = 1;
     if (categoryproduct.toLowerCase() === "coffee") rescategory = 2;
     if (categoryproduct.toLowerCase() === "non coffee") rescategory = 3;
+    if (categoryproduct.toLowerCase() === "mix snack") rescategory = 4;
     const query =
       "insert into products (product_name, price, category_id, image, description) values ($1,$2,$3,$4,$5) RETURNING id";
     postgreDb.query(
