@@ -237,16 +237,16 @@ const editUser = (body, token) => {
     const userId = token.user_id;
     let values = [];
     if (email && phone) {
-      query += "phone = $1, email = $2, updated_at = now() where user_id = $3";
-      value.push(phone, email, userId);
+      query += "phone = $1, email = $2, updated_at = now() where id = $3";
+      values.push(phone, email, userId);
     }
     if (email && !phone) {
-      query += "email = $1, updated_at = now() where user_id = $2";
-      value.push(email, userId);
+      query += "email = $1, updated_at = now() where id = $2";
+      values.push(email, userId);
     }
     if (!email && phone) {
-      query += "phone = $1, updated_at = now() where user_id = $2";
-      value.push(phone, userId);
+      query += "phone = $1, updated_at = now() where id = $2";
+      values.push(phone, userId);
     }
     postgreDb
       .query(query, values)
