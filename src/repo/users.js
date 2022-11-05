@@ -175,23 +175,6 @@ const editPorfile = (body, token, file) => {
         return resolve(notFound());
       }
       Object.keys(body).forEach((key, idx, array) => {
-        if (
-          body[key] == resData.rows[0].display_name ||
-          body[key] == resData.rows[0].firstname ||
-          body[key] == resData.rows[0].lastname ||
-          body[key] == resData.rows[0].date_of_birth ||
-          body[key] == resData.rows[0].adress ||
-          body[key] == resData.rows[0].gender
-        ) {
-          if (file) {
-            deleteFile(file.path);
-          }
-          return resolve(
-            custMsg(
-              "The data you want to change is not allowed to be the same as the previous data"
-            )
-          );
-        }
         if (key == "image") key = "displaypicture";
         if (idx === array.length - 1) {
           query += `${key} = $${idx + 1},updated_at = now() where user_id = $${
