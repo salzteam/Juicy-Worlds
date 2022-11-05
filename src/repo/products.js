@@ -77,7 +77,6 @@ const getbyid = (params) => {
         const Response = {
           dataPromo: dataPromo,
         };
-        console.log(result.rows);
         resolve(success(Response));
       }
     );
