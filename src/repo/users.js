@@ -211,12 +211,18 @@ const editUser = (body, token) => {
     const validasiEmail = `select email from users where email like $1`;
     const validasiPhone = `select phone from users where phone like $1`;
     postgreDb.query(validasiEmail, [email], (err, resEmail) => {
-      if (err) return resolve(systemError());
+      if (err) {
+        console.log(err);
+        return resolve(systemError());
+      }
       if (resEmail.rows.length > 0) {
         return resolve(emailreadyexsits());
       }
       postgreDb.query(validasiPhone, [phone], (err, resPhone) => {
-        if (err) return resolve(systemError());
+        if (err) {
+          console.log(err);
+          return resolve(systemError());
+        }
         if (resPhone.rows.length > 0) {
           return resolve(phonealreadyexsits());
         }
