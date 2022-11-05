@@ -208,17 +208,21 @@ const editUser = (body, token) => {
   return new Promise((resolve, reject) => {
     const { email, phone } = body;
     let query = "update users set ";
-    const validasiEmail = `select email from users where email like $1`;
-    const validasiPhone = `select phone from users where phone like $1`;
-    postgreDb.query(validasiEmail, [email], (err, resEmail) => {
-      console.log("email");
-      if (err) {
-        console.log(err);
-        return resolve(systemError());
-      }
-      if (resEmail.rows.length > 0) {
-        return resolve(emailreadyexsits());
-      }
+    if (email) {
+      const validasiEmail = `select email from users where email like $1`;
+      postgreDb.query(validasiEmail, [email], (err, resEmail) => {
+        console.log("email");
+        if (err) {
+          console.log(err);
+          return resolve(systemError());
+        }
+        if (resEmail.rows.length > 0) {
+          return resolve(emailreadyexsits());
+        }
+      });
+    }
+    if (phone) {
+      const validasiPhone = `select phone from users where phone like $1`;
       postgreDb.query(validasiPhone, [phone], (err, resPhone) => {
         console.log("password");
         if (err) {
@@ -228,35 +232,32 @@ const editUser = (body, token) => {
         if (resPhone.rows.length > 0) {
           return resolve(phonealreadyexsits());
         }
-        const values = [];
-        const userId = token.user_id;
-        let data = {};
-        Object.keys(body).forEach((key, idx, array) => {
-          if (idx === array.length - 1) {
-            query += `${key} = $${idx + 1},updated_at = now() where id = $${
-              idx + 2
-            }`;
-            values.push(body[key], userId);
-            data[key] = body[key];
-            return;
-          }
-          query += `${key} = $${idx + 1},`;
-          values.push(body[key]);
-          data[key] = body[key];
-        });
-        console.log(query);
-        postgreDb
-          .query(query, values)
-          .then((response) => {
-            resolve(success(data));
-          })
-          .catch((err) => {
-            console.log("terakhir");
-            console.log(err);
-            resolve(systemError());
-          });
       });
-    });
+    }
+    const userId = token.user_id;
+    let values = [];
+    if (email && phone) {
+      query += "phone = $1, email = $2, updated_at = now() where user_id = $3";
+      value.push(phone, email, userId);
+    }
+    if (email && !phone) {
+      query += "email = $1, updated_at = now() where user_id = $2";
+      value.push(email, userId);
+    }
+    if (!email && phone) {
+      query += "phone = $1, updated_at = now() where user_id = $2";
+      value.push(phone, userId);
+    }
+    postgreDb
+      .query(query, values)
+      .then((response) => {
+        resolve(success(response.rows));
+      })
+      .catch((err) => {
+        console.log("terakhir");
+        console.log(err);
+        resolve(systemError());
+      });
   });
 };
 
