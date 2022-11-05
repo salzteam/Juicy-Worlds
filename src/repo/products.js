@@ -147,6 +147,7 @@ const getProducts = (queryParams, hostApi) => {
   return new Promise((resolve, reject) => {
     let link = `${hostApi}/api/v1/products?`;
     let query = `select p.id, p.product_name, p.price, c.category_name, p.image, p.description from products p left join categories c on p.category_id = c.id`;
+    let querPopular = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc`;
     let queryLimit = "";
     if (queryParams.search) {
       query += ` where lower(p.product_name) like lower('%${queryParams.search}%')`;
@@ -180,6 +181,22 @@ const getProducts = (queryParams, hostApi) => {
       if (queryParams.filter) {
         query = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id where lower(c.category_name) like lower ('%${queryParams.filter}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc`;
         link += `filter=${queryParams.filter}&transactions=${queryParams.transactions}&`;
+      }
+      if (queryParams.price == "cheap") {
+        querPopular += `, p.price asc`;
+        link += `price=${queryParams.price}&`;
+      }
+      if (queryParams.price == "pricey") {
+        querPopular += `, p.price desc`;
+        link += `price=${queryParams.price}&`;
+      }
+      if (queryParams.sortby == "newest") {
+        query += `, order by p.created_at desc`;
+        link += `sortby=${queryParams.sortby}&`;
+      }
+      if (queryParams.sortby == "latest") {
+        query += `, order by p.created_at asc`;
+        link += `sortby=${queryParams.sortby}&`;
       } else {
         query = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc`;
         link += `transactions=${queryParams.transactions}&`;
