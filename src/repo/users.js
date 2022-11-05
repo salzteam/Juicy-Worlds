@@ -211,6 +211,7 @@ const editUser = (body, token) => {
     const validasiEmail = `select email from users where email like $1`;
     const validasiPhone = `select phone from users where phone like $1`;
     postgreDb.query(validasiEmail, [email], (err, resEmail) => {
+      console.log("email");
       if (err) {
         console.log(err);
         return resolve(systemError());
@@ -219,6 +220,7 @@ const editUser = (body, token) => {
         return resolve(emailreadyexsits());
       }
       postgreDb.query(validasiPhone, [phone], (err, resPhone) => {
+        console.log("password");
         if (err) {
           console.log(err);
           return resolve(systemError());
@@ -249,6 +251,7 @@ const editUser = (body, token) => {
             resolve(success(data));
           })
           .catch((err) => {
+            console.log("terakhir");
             console.log(err);
             resolve(systemError());
           });
