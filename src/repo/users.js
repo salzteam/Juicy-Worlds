@@ -284,7 +284,7 @@ const editPassword = (body, token) => {
             return resolve(systemError());
           }
           const editPwdQuery =
-            "UPDATE users SET password = $1, updated_at = now() WHERE email = $2";
+            "UPDATE users SET password = $1, updated_at = now() WHERE id = $2";
           const editPwdValues = [newHashedPassword, token.user_id];
           postgreDb.query(editPwdQuery, editPwdValues, (err, response) => {
             if (err) {
