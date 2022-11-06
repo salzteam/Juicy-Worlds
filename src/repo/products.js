@@ -222,17 +222,19 @@ const getProducts = (queryParams, hostApi) => {
       }
     }
     // PAGINASI
+    let sendQuery = query;
+    if (queryParams.transactions == "popular") sendQuery = querPopular;
     let values = [];
     if (queryParams.page && queryParams.limit) {
       let page = parseInt(queryParams.page);
       let limit = parseInt(queryParams.limit);
       let offset = (page - 1) * limit;
-      queryLimit = query + ` limit $1 offset $2`;
+      queryLimit = sendQuery + ` limit $1 offset $2`;
       values.push(limit, offset);
     } else {
-      queryLimit = query;
+      queryLimit = sendQuery;
     }
-    postgreDb.query(query, (err, getData) => {
+    postgreDb.query(sendQuery, (err, getData) => {
       postgreDb.query(queryLimit, values, (err, result) => {
         if (err) {
           console.log(err);
