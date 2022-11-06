@@ -118,7 +118,11 @@ const resetPassword = (body, hostApi) => {
                 NX: true,
               })
               .then(() => {
-                resolve(success("Link OTP send to email"));
+                const data = {
+                  message: "Link OTP send to email",
+                  code: OTP,
+                };
+                resolve(success(data));
               })
               .then(() => {
                 client
