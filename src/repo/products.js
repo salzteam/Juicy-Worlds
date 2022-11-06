@@ -149,18 +149,26 @@ const getProducts = (queryParams, hostApi) => {
     let query = `select p.id, p.product_name, p.price, c.category_name, p.image, p.description from products p left join categories c on p.category_id = c.id`;
     let querPopular = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc`;
     let queryLimit = "";
-    if (queryParams.search) {
+    if (queryParams.search && !queryParams.filter) {
       query += ` where lower(p.product_name) like lower('%${queryParams.search}%')`;
       link += `search=${queryParams.search}&`;
     }
-    if (queryParams.filter) {
-      if (queryParams.search) {
-        query += ` and lower(c.category_name) like lower('${queryParams.filter}')`;
-        link += `filter=${queryParams.filter}&`;
-      }
+    if (queryParams.filter && queryParams.search) {
+      query += ` where lower(p.product_name) like lower('%${queryParams.search}%') and lower(c.category_name) like lower('${queryParams.filter}')`;
+      link += `filter=${queryParams.filter}&`;
+    }
+    if (queryParams.filter && !queryParams.search) {
       query += ` where lower(c.category_name) like lower ('${queryParams.filter}')`;
       link += `filter=${queryParams.filter}&`;
     }
+    // if (queryParams.filter) {
+    //   if (queryParams.search) {
+    //     query += ` and lower(c.category_name) like lower('${queryParams.filter}')`;
+    //     link += `filter=${queryParams.filter}&`;
+    //   }
+    //   query += ` where lower(c.category_name) like lower ('${queryParams.filter}')`;
+    //   link += `filter=${queryParams.filter}&`;
+    // }
     if (queryParams.sortby == "newest") {
       query += ` order by p.created_at desc`;
       link += `sortby=${queryParams.sortby}&`;
@@ -178,14 +186,14 @@ const getProducts = (queryParams, hostApi) => {
       link += `price=${queryParams.price}&`;
     }
     if (queryParams.transactions == "popular") {
-      if (queryParams.search) {
-        if (queryParams.price == "cheap") {
-          if (queryParams.sortby == "newest") {
+      if (queryParams.transactions && queryParams.search) {
+        if (queryParams.transactions && queryParams.price == "cheap") {
+          if (queryParams.transactions && queryParams.sortby == "newest") {
             querPopular += `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id
             where lower(p.product_name) like lower('%${queryParams.search}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc, p.price asc,p.created_at desc`;
             link += `sortby=${queryParams.sortby}&`;
           }
-          if (queryParams.sortby == "latest") {
+          if (queryParams.transactions && queryParams.sortby == "latest") {
             querPopular += `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id
             where lower(p.product_name) like lower('%${queryParams.search}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc, p.price asc, p.created_at asc`;
             link += `sortby=${queryParams.sortby}&`;
@@ -194,13 +202,13 @@ const getProducts = (queryParams, hostApi) => {
           where lower(p.product_name) like lower('%${queryParams.search}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc, p.price asc`;
           link += `price=${queryParams.price}&`;
         }
-        if (queryParams.price == "pricey") {
-          if (queryParams.sortby == "newest") {
+        if (queryParams.transactions && queryParams.price == "pricey") {
+          if (queryParams.transactions && queryParams.sortby == "newest") {
             querPopular += `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id
             where lower(p.product_name) like lower('%${queryParams.search}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc, p.price desc,p.created_at desc`;
             link += `sortby=${queryParams.sortby}&`;
           }
-          if (queryParams.sortby == "latest") {
+          if (queryParams.transactions && queryParams.sortby == "latest") {
             querPopular += `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id
             where lower(p.product_name) like lower('%${queryParams.search}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc, p.price desc, p.created_at asc`;
             link += `sortby=${queryParams.sortby}&`;
@@ -209,12 +217,12 @@ const getProducts = (queryParams, hostApi) => {
           where lower(p.product_name) like lower('%${queryParams.search}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc, p.price desc`;
           link += `price=${queryParams.price}&`;
         }
-        if (queryParams.sortby == "newest") {
+        if (queryParams.transactions && queryParams.sortby == "newest") {
           querPopular += `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id
           where lower(p.product_name) like lower('%${queryParams.search}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc, p.created_at desc`;
           link += `sortby=${queryParams.sortby}&`;
         }
-        if (queryParams.sortby == "latest") {
+        if (queryParams.transactions && queryParams.sortby == "latest") {
           querPopular += `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id
           where lower(p.product_name) like lower('%${queryParams.search}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc, p.created_at asc`;
           link += `sortby=${queryParams.sortby}&`;
@@ -223,8 +231,8 @@ const getProducts = (queryParams, hostApi) => {
         where lower(p.product_name) like lower('%${queryParams.search}%') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc`;
         link += `search=${queryParams.search}&`;
       }
-      if (queryParams.filter) {
-        if (queryParams.search) {
+      if (queryParams.transactions && queryParams.filter) {
+        if (queryParams.transactions && queryParams.search) {
           querPopular = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id
           where lower(p.product_name) like lower('%${queryParams.search}%') and lower(c.category_name) like lower('${queryParams.filter}') group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc`;
           link += `search=${queryParams.search}&`;
@@ -263,12 +271,15 @@ const getProducts = (queryParams, hostApi) => {
     // PAGINASI
     let sendQuery = query;
     if (
-      (queryParams.transactions == "popular" && queryParams.search) ||
+      (queryParams.transactions &&
+        queryParams.transactions == "popular" &&
+        queryParams.search) ||
       (queryParams.transactions == "popular" && !queryParams.search)
     ) {
       sendQuery = querPopular;
       console.log(sendQuery);
     }
+    console.log(sendQuery);
     let values = [];
     if (queryParams.page && queryParams.limit) {
       let page = parseInt(queryParams.page);
