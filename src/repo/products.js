@@ -98,7 +98,7 @@ const editProducts = (body, params, file) => {
     };
     if (file) {
       imageProduct = file.url;
-      if (!product_name && !price && !category_id) {
+      if (!product_name && !price && !category_id && !description) {
         if (file && file.resource_type == "image") {
           query += `image = '${imageProduct}',updated_at = now() where id = $1`;
           values.push(params.id);
