@@ -15,16 +15,16 @@ const createProducts = (body, file) => {
     if (file) {
       image = file.url;
     }
-    let rescategory = "";
-    if (categoryproduct.toLowerCase() === "foods") rescategory = 1;
-    if (categoryproduct.toLowerCase() === "coffee") rescategory = 2;
-    if (categoryproduct.toLowerCase() === "non coffee") rescategory = 3;
-    if (categoryproduct.toLowerCase() === "add on") rescategory = 4;
+    // let rescategory = "";
+    // if (categoryproduct.toLowerCase() === "foods") rescategory = 1;
+    // if (categoryproduct.toLowerCase() === "coffee") rescategory = 2;
+    // if (categoryproduct.toLowerCase() === "non coffee") rescategory = 3;
+    // if (categoryproduct.toLowerCase() === "add on") rescategory = 4;
     const query =
       "insert into products (product_name, price, category_id, image, description) values ($1,$2,$3,$4,$5) RETURNING id";
     postgreDb.query(
       query,
-      [nameProduct, priceProduct, rescategory, image, description],
+      [nameProduct, priceProduct, categoryproduct, image, description],
       (err, queryResult) => {
         if (err) {
           console.log(err);
