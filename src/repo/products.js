@@ -24,7 +24,7 @@ const createProducts = (body, file) => {
       "insert into products (product_name, price, category_id, image, description) values ($1,$2,$3,$4,$5) RETURNING id";
     postgreDb.query(
       query,
-      [nameProduct, priceProduct, rescategory, image],
+      [nameProduct, priceProduct, rescategory, image, description],
       (err, queryResult) => {
         if (err) {
           console.log(err);
