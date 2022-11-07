@@ -5,6 +5,12 @@ const validate = require("../middlewares/validate");
 const isLogin = require("../middlewares/isLogin");
 const isAllowed = require("../middlewares/allowedRole");
 const { create, drop, get, edit } = require("../controllers/promo");
+const {
+  diskUpload,
+  memoryUpload,
+  errorHandler,
+} = require("../middlewares/upload");
+const productUpload = require("../middlewares/productUpload.js");
 // promoRouter.post(
 //   "/create",
 //   isLogin(),
