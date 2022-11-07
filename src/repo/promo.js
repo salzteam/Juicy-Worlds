@@ -37,7 +37,7 @@ const createPromo = (body, file) => {
       image = file.url;
     }
     const query =
-      "insert into promos (code, discount, product_id, desc, imageDp, bgcolor, title, start, end) values ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id";
+      "insert into promos (code, discount, product_id, desc, imagePP, bgcolor, title, start, end) values ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id";
     postgreDb.query(
       query,
       [code, discount, product_id, desc, image, color, title, start, end],
