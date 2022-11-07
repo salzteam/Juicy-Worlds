@@ -44,9 +44,6 @@ const createPromo = (body, file) => {
       (err, queryResult) => {
         if (err) {
           console.log(err);
-          if (file) {
-            deleteFile(file.path);
-          }
           return resolve(systemError());
         }
         resolve(
