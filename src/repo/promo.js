@@ -91,13 +91,13 @@ const editPromo = (body, params, file) => {
       imageProduct = file.url;
       if (body.length === 0) {
         if (file && file.resource_type == "image") {
-          query += `image = '${imageProduct}',updated_at = now() where id = $1`;
+          query += `imagepp = '${imageProduct}',updated_at = now() where id = $1`;
           values.push(params.id);
           data["image"] = imageProduct;
         }
       } else {
         if (file && file.resource_type == "image") {
-          query += `image = '${imageProduct}',`;
+          query += `imagepp = '${imageProduct}',`;
           data["image"] = imageProduct;
         }
       }
