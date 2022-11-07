@@ -81,7 +81,6 @@ const deletePromo = (params) => {
 
 const editPromo = (body, params, file) => {
   return new Promise((resolve, reject) => {
-    const { product_name, price, category_id, description } = body;
     let query = "update promos set ";
     const values = [];
     let imageProduct = "";
@@ -90,7 +89,7 @@ const editPromo = (body, params, file) => {
     };
     if (file) {
       imageProduct = file.url;
-      if (!product_name && !price && !category_id && !description) {
+      if (body.length === 0) {
         if (file && file.resource_type == "image") {
           query += `image = '${imageProduct}',updated_at = now() where id = $1`;
           values.push(params.id);
