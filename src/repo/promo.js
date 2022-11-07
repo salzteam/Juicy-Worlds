@@ -179,7 +179,7 @@ const editPromo = (body, params) => {
 const getPromo = (queryParams, hostApi) => {
   return new Promise((resolve, reject) => {
     let link = `${hostApi}/api/v1/promo?`;
-    let query = `select pr.code, pr.*, p.id,p.product_name, p.price, c.category_name, p.image from promos pr left join products p on pr.product_id = p.id join categories c on p.category_id = c.id`;
+    let query = `select pr.code, pr.*, p.product_name, p.price, c.category_name, p.image from promos pr left join products p on pr.product_id = p.id join categories c on p.category_id = c.id`;
     let queryLimit = "";
     if (queryParams.search) {
       query += ` where lower(p.product_name) like lower('%${queryParams.search}%')`;
