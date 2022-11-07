@@ -10,7 +10,7 @@ const {
   memoryUpload,
   errorHandler,
 } = require("../middlewares/upload");
-const productUpload = require("../middlewares/productUpload.js");
+const promoUpload = require("../middlewares/promoUpload");
 // promoRouter.post(
 //   "/create",
 //   isLogin(),
@@ -36,7 +36,7 @@ promoRouter.post(
     memoryUpload.single("image")(req, res, (err) => {
       errorHandler(err, res, next);
     }),
-  productUpload,
+  promoUpload,
   validate.img(),
   create
 );
@@ -44,7 +44,23 @@ promoRouter.patch(
   "/edit/:id",
   isLogin(),
   isAllowed("admin"),
-  validate.body("code", "discount", "product_id"),
+  validate.params("id"),
+  validate.body(
+    "code",
+    "discount",
+    "product_id",
+    "start",
+    "end",
+    "color",
+    "title",
+    "desc"
+  ),
+  (req, res, next) =>
+    memoryUpload.single("image")(req, res, (err) => {
+      errorHandler(err, res, next);
+    }),
+  promoUpload,
+  validate.img(),
   edit
 );
 promoRouter.delete(

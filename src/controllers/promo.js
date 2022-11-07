@@ -9,7 +9,7 @@ const drop = async (req, res) => {
   res.status(result.statusCode).send(result);
 };
 const edit = async (req, res) => {
-  const result = await promoRepo.editPromo(req.body, req.params);
+  const result = await promoRepo.editPromo(req.body, req.params, req.file);
   res.status(result.statusCode).send(result);
 };
 const get = async (req, res) => {

@@ -78,15 +78,31 @@ const deletePromo = (params) => {
     });
   });
 };
-const editPromo = (body, params) => {
+
+const editPromo = (body, params, file) => {
   return new Promise((resolve, reject) => {
-    console.log(body);
-    console.log(params);
+    const { product_name, price, category_id, description } = body;
     let query = "update promos set ";
     const values = [];
+    let imageProduct = "";
     let data = {
       id: params.id,
     };
+    if (file) {
+      imageProduct = file.url;
+      if (!product_name && !price && !category_id && !description) {
+        if (file && file.resource_type == "image") {
+          query += `image = '${imageProduct}',updated_at = now() where id = $1`;
+          values.push(params.id);
+          data["image"] = imageProduct;
+        }
+      } else {
+        if (file && file.resource_type == "image") {
+          query += `image = '${imageProduct}',`;
+          data["image"] = imageProduct;
+        }
+      }
+    }
     Object.keys(body).forEach((key, idx, array) => {
       if (idx === array.length - 1) {
         query += `${key} = $${idx + 1}, updated_at = now() where id = $${
@@ -97,20 +113,61 @@ const editPromo = (body, params) => {
         return;
       }
       query += `${key} = $${idx + 1},`;
-      values.push(body[key]);
       data[key] = body[key];
+      values.push(body[key]);
     });
     postgreDb
       .query(query, values)
       .then((response) => {
-        resolve(success(data));
+        if (file) {
+          return resolve(success(data));
+        } else {
+          return resolve(success(data));
+        }
       })
       .catch((err) => {
         console.log(err);
+        if (file) {
+          deleteFile(file.path);
+        }
         resolve(systemError());
       });
   });
 };
+
+// const editPromo = (body, params) => {
+//   return new Promise((resolve, reject) => {
+//     console.log(body);
+//     console.log(params);
+//     let query = "update promos set ";
+//     const values = [];
+//     let data = {
+//       id: params.id,
+//     };
+//     Object.keys(body).forEach((key, idx, array) => {
+//       if (idx === array.length - 1) {
+//         query += `${key} = $${idx + 1}, updated_at = now() where id = $${
+//           idx + 2
+//         }`;
+//         values.push(body[key], params.id);
+//         data[key] = body[key];
+//         return;
+//       }
+//       query += `${key} = $${idx + 1},`;
+//       values.push(body[key]);
+//       data[key] = body[key];
+//     });
+//     postgreDb
+//       .query(query, values)
+//       .then((response) => {
+//         resolve(success(data));
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//         resolve(systemError());
+//       });
+//   });
+// };
 // const getPromo = (Params) => {
 //   return new Promise((resolve, reject) => {
 //     let link = `${port_paginasi}api/v1/promo?`;
