@@ -177,12 +177,20 @@ const getProducts = (queryParams, hostApi) => {
       query += ` order by p.created_at asc`;
       link += `sortby=${queryParams.sortby}&`;
     }
-    if (queryParams.price == "cheap") {
+    if (queryParams.price == "cheap" && queryParams.sortby) {
+      query += `, p.price asc`;
+      link += `price=${queryParams.price}&`;
+    }
+    if (queryParams.price == "cheap" && !queryParams.sortby) {
       query += ` order by p.price asc`;
       link += `price=${queryParams.price}&`;
     }
-    if (queryParams.price == "pricey") {
+    if (queryParams.price == "pricey" && !queryParams.sortby) {
       query += ` order by p.price desc`;
+      link += `price=${queryParams.price}&`;
+    }
+    if (queryParams.price == "pricey" && queryParams.sortby) {
+      query += `, p.price desc`;
       link += `price=${queryParams.price}&`;
     }
     if (queryParams.transactions == "popular") {
