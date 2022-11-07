@@ -244,11 +244,25 @@ const getPromo = (queryParams, hostApi) => {
     });
   });
 };
+const getPromoId = (params) => {
+  return new Promise((resolve, reject) => {
+    let query = `select pr.code, pr.*, p.id,p.product_name, p.price, c.category_name, p.image from promos pr left join products p on pr.product_id = p.id join categories c on p.category_id = c.id where pr.id = $1`;
+    postgreDb.query(query, [params.id], (err, result) => {
+      if (err) {
+        console.log(err);
+        return resolve(systemError());
+      }
+      console.log(result);
+      resolve(success(result.rows));
+    });
+  });
+};
 const promoRepo = {
   createPromo,
   deletePromo,
   editPromo,
   getPromo,
+  getPromoId,
 };
 
 module.exports = promoRepo;

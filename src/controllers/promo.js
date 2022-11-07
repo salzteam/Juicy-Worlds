@@ -17,11 +17,16 @@ const get = async (req, res) => {
   const result = await promoRepo.getPromo(req.query, hostApi);
   res.status(result.statusCode).send(result);
 };
+const getid = async (req, res) => {
+  const result = await promoRepo.getPromoId(req.params);
+  res.status(result.statusCode).send(result);
+};
 const promoControllers = {
   create,
   drop,
   edit,
   get,
+  getid,
 };
 
 module.exports = promoControllers;

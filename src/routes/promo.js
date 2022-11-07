@@ -4,7 +4,7 @@ const promoRouter = express.Router();
 const validate = require("../middlewares/validate");
 const isLogin = require("../middlewares/isLogin");
 const isAllowed = require("../middlewares/allowedRole");
-const { create, drop, get, edit } = require("../controllers/promo");
+const { create, drop, get, edit, getid } = require("../controllers/promo");
 const {
   diskUpload,
   memoryUpload,
@@ -55,4 +55,5 @@ promoRouter.delete(
   drop
 );
 promoRouter.get("/", get);
+promoRouter.get("/:id", getid);
 module.exports = promoRouter;
