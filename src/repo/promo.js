@@ -7,25 +7,64 @@ const {
 } = require("../helpers/templateResponse");
 const postgreDb = require("../config/postgre");
 
-const createPromo = (body) => {
+// const createPromo = (body) => {
+//   return new Promise((resolve, reject) => {
+//     let { code, discount, product_id, image } = body;
+//     const query =
+//       "insert into promos (code, discount, product_id) values ($1,$2,$3) RETURNING id";
+//     postgreDb.query(query, [code, discount, product_id], (err, queryResult) => {
+//       if (err) {
+//         console.log(err);
+//         return resolve(systemError());
+//       }
+//       resolve(
+//         created({
+//           id: queryResult.rows[0].id,
+//           code: code,
+//           discount: discount + "%",
+//           product_id: product_id,
+//         })
+//       );
+//     });
+//   });
+// };
+
+const createPromo = (body, file) => {
   return new Promise((resolve, reject) => {
-    let { code, discount, product_id } = body;
+    let { code, discount, product_id, start, end, color, title, desc } = body;
+    let image = null;
+    if (file) {
+      image = file.url;
+    }
     const query =
-      "insert into promos (code, discount, product_id) values ($1,$2,$3) RETURNING id";
-    postgreDb.query(query, [code, discount, product_id], (err, queryResult) => {
-      if (err) {
-        console.log(err);
-        return resolve(systemError());
+      "insert into promos (code, discount, product_id, desc, imageDp, bgcolor, title, start, end) values ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id";
+    postgreDb.query(
+      query,
+      [code, discount, product_id, desc, image, color, title, start, end],
+      (err, queryResult) => {
+        if (err) {
+          console.log(err);
+          if (file) {
+            deleteFile(file.path);
+          }
+          return resolve(systemError());
+        }
+        resolve(
+          created({
+            id: queryResult.rows[0].id,
+            Product_id: product_id,
+            Title: title,
+            Code: code,
+            Discount: discount,
+            Description: desc,
+            Color: color,
+            Start: start,
+            End: end,
+            Image: image,
+          })
+        );
       }
-      resolve(
-        created({
-          id: queryResult.rows[0].id,
-          code: code,
-          discount: discount + "%",
-          product_id: product_id,
-        })
-      );
-    });
+    );
   });
 };
 

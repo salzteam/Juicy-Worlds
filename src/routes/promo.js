@@ -5,11 +5,33 @@ const validate = require("../middlewares/validate");
 const isLogin = require("../middlewares/isLogin");
 const isAllowed = require("../middlewares/allowedRole");
 const { create, drop, get, edit } = require("../controllers/promo");
+// promoRouter.post(
+//   "/create",
+//   isLogin(),
+//   isAllowed("admin"),
+//   validate.body("code", "discount", "product_id"),
+//   create
+// );
 promoRouter.post(
   "/create",
   isLogin(),
   isAllowed("admin"),
-  validate.body("code", "discount", "product_id"),
+  validate.body(
+    "code",
+    "discount",
+    "product_id",
+    "start",
+    "end",
+    "color",
+    "title",
+    "desc"
+  ),
+  (req, res, next) =>
+    memoryUpload.single("image")(req, res, (err) => {
+      errorHandler(err, res, next);
+    }),
+  productUpload,
+  validate.img(),
   create
 );
 promoRouter.patch(

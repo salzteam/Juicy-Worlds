@@ -1,7 +1,7 @@
 const promoRepo = require("../repo/promo");
 
 const create = async (req, res) => {
-  const result = await promoRepo.createPromo(req.body);
+  const result = await promoRepo.createPromo(req.body, req.file);
   res.status(result.statusCode).send(result);
 };
 const drop = async (req, res) => {
