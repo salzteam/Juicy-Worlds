@@ -113,7 +113,7 @@ const resetPassword = (body, hostApi) => {
           client.get(email).then((results) => {
             if (results) return resolve(custMsg("Code already send to email!"));
             client
-              .set(email, OTP, {
+              .set(OTP, email, {
                 EX: 120,
                 NX: true,
               })
@@ -123,45 +123,36 @@ const resetPassword = (body, hostApi) => {
                   code: OTP,
                 };
                 resolve(success(data));
-              })
-              .then(() => {
-                client
-                  .set(OTP, email, {
-                    EX: 120,
-                    NX: true,
-                  })
-                  .then();
               });
           });
           // });
         });
       }
     }
-    if (!email) {
-      if (code && new_password) {
-        client.get(code).then((results) => {
-          if (!results) return resolve(custMsg("Code OTP Wrong!"));
-          bcrypt.hash(new_password, 10, (err, newHashedPassword) => {
+    if (code && new_password && email) {
+      client.get(code).then((results) => {
+        if (!results || results !== email)
+          return resolve(custMsg("Code OTP Wrong!"));
+        bcrypt.hash(new_password, 10, (err, newHashedPassword) => {
+          if (err) {
+            console.log(err);
+            return resolve(systemError());
+          }
+          const editPwdQuery =
+            "UPDATE users SET password = $1, updated_at = now() WHERE email = $2";
+          const editPwdValues = [newHashedPassword, results];
+          postgreDb.query(editPwdQuery, editPwdValues, (err, response) => {
             if (err) {
               console.log(err);
               return resolve(systemError());
             }
-            const editPwdQuery =
-              "UPDATE users SET password = $1, updated_at = now() WHERE email = $2";
-            const editPwdValues = [newHashedPassword, results];
-            postgreDb.query(editPwdQuery, editPwdValues, (err, response) => {
-              if (err) {
-                console.log(err);
-                return resolve(systemError());
-              }
-              resolve(success(null));
-              client.del(code).then(() => {
-                return client.del(results).then();
-              });
+            resolve(success(null));
+            client.del(code).then(() => {
+              return client.del(results).then();
             });
           });
         });
-      }
+      });
     }
   });
 };
