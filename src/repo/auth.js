@@ -93,7 +93,7 @@ const logoutUser = (token) => {
   });
 };
 
-const resetPassword = (body, hostApi) => {
+const resetPassword = (body) => {
   return new Promise((resolve, reject) => {
     const { code, new_password, email } = body;
     if (email) {
@@ -110,7 +110,7 @@ const resetPassword = (body, hostApi) => {
           for (let i = 0; i < 6; i++) {
             OTP += digits[Math.floor(Math.random() * 10)];
           }
-          client.get(email).then((results) => {
+          client.get(OTP).then((results) => {
             if (results) return resolve(custMsg("Code already send to email!"));
             client
               .set(OTP, email, {
