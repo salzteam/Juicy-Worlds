@@ -22,7 +22,7 @@ const payment = async (req, res) => {
 };
 
 const get = async (req, res) => {
-  const hostApi = `${req.protocol}://${req.hostname}:${process.env.PORT}`;
+  const hostApi = `${req.protocol}://${req.hostname}`;
   const result = await transactionsRepo.getTransactions(req.query, hostApi);
   res.status(result.statusCode).send(result);
 };
