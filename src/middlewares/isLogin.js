@@ -16,6 +16,7 @@ module.exports = () => {
         next();
       })
       .catch((err) => {
+        console.log(err);
         return res
           .status(401)
           .json({ msg: "You have to login first", data: null });
