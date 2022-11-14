@@ -81,6 +81,19 @@ const deletePromo = (params) => {
 
 const editPromo = (body, params, file) => {
   return new Promise((resolve, reject) => {
+    const {
+      user_id,
+      fee,
+      payment,
+      delivery,
+      promo_id,
+      notes,
+      status,
+      product_id,
+      size,
+      qty,
+      subtotal,
+    } = body;
     let query = "update promos set ";
     const values = [];
     let imageProduct = "";
@@ -89,7 +102,20 @@ const editPromo = (body, params, file) => {
     };
     if (file) {
       imageProduct = file.url;
-      if (body.length === 0) {
+      if (
+        !user_id &&
+        !fee &&
+        !payment &&
+        !delivery &&
+        !promo_id &&
+        !notes &&
+        !status &&
+        !product_id &&
+        !size &&
+        !size &&
+        !qty &&
+        !subtotal
+      ) {
         if (file && file.resource_type == "image") {
           query += `imagepp = '${imageProduct}',updated_at = now() where id = $1`;
           values.push(params.id);
@@ -115,6 +141,7 @@ const editPromo = (body, params, file) => {
       data[key] = body[key];
       values.push(body[key]);
     });
+    console.log(query);
     postgreDb
       .query(query, values)
       .then((response) => {
@@ -126,9 +153,6 @@ const editPromo = (body, params, file) => {
       })
       .catch((err) => {
         console.log(err);
-        if (file) {
-          deleteFile(file.path);
-        }
         resolve(systemError());
       });
   });
