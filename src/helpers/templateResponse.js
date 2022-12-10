@@ -102,9 +102,9 @@ exports.msgList = {
   NOT_FOUND: `data_not_found`,
   INVALID_TOKEN: "invalid_token",
   NO_TOKEN_PROVIDED: "no_token_provided",
-  EMAIL_ALREADY_EXIST: "*email already exists*",
-  PHONE_ALREADY_EXIST: "*phone already exists*",
-  DATA_ALREADY_EXIST: "data already exists",
+  EMAIL_ALREADY_EXIST: "Email already exists",
+  PHONE_ALREADY_EXIST: "Phone already exists",
+  DATA_ALREADY_EXIST: "Data already exists",
   USER_LOGIN: "login success",
   WRONG_DATA: "Email/Password is Wrong",
 };

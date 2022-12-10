@@ -21,13 +21,5 @@ module.exports = () => {
           .status(401)
           .json({ msg: "You have to login first", data: null });
       });
-    // (err, decodedPayload) => {
-    //   console.log("test2");
-    //   if (err) {
-    //     console.log(err);
-    //     return res.status(403).json({ msg: err.message, data: null });
-    //   }
-    //   req.userPayload = decodedPayload;
-    //  };
   };
 };

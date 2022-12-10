@@ -321,6 +321,7 @@ const getUsersDatas = () => {
     });
   });
 };
+
 const getUsersProfile = (token) => {
   return new Promise((resolve, reject) => {
     const query = "select * from users where id = $1";
