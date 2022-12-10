@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const JWTR = require("jwt-redis").default;
 const postgreDb = require("../config/postgre");
+const { sendMails } = require("../config/email");
 const response = require("../helpers/response");
 const {
   userLogin,
@@ -98,34 +99,44 @@ const resetPassword = (body) => {
     const { code, new_password, email } = body;
     if (email) {
       if (!code && !new_password) {
-        let queryEmail = "select email from users where email = $1";
+        let queryEmail =
+          "select u.email, ud.display_name from users u left join userdata ud on u.id = ud.user_id where u.email = $1";
         postgreDb.query(queryEmail, [email], (err, resEmail) => {
           if (err) {
             console.log(err.message);
             resolve(systemError());
           }
-          if (resEmail.rows.length == 0) resolve(wrongData());
+          if (resEmail.rows.length == 0) return resolve(wrongData());
           const digits = "0123456789";
           let OTP = "";
           for (let i = 0; i < 6; i++) {
             OTP += digits[Math.floor(Math.random() * 10)];
           }
-          client.get(OTP).then((results) => {
-            if (results) return resolve(custMsg("Code already send to email!"));
-            client
-              .set(OTP, email, {
-                EX: 120,
-                NX: true,
-              })
-              .then(() => {
-                const data = {
-                  message: "Link OTP send to email",
-                  code: OTP,
-                };
-                resolve(success(data));
-              });
+          //   console.log(resEmail.rows[0].name);
+          const sendName = resEmail.rows[0].display_name || null;
+          sendMails({
+            to: email,
+            OTP: OTP,
+            name: sendName,
+          }).then((result) => {
+            client.get(OTP).then((results) => {
+              if (results)
+                return resolve(custMsg("Code already send to email!"));
+              client
+                .set(OTP, email, {
+                  EX: 120,
+                  NX: true,
+                })
+                .then(() => {
+                  const data = {
+                    message: "Link OTP send to email",
+                    code: OTP,
+                  };
+                  resolve(success(data));
+                });
+            });
+            // });
           });
-          // });
         });
       }
     }
@@ -156,6 +167,70 @@ const resetPassword = (body) => {
     }
   });
 };
+
+// const resetPassword = (body) => {
+//   return new Promise((resolve, reject) => {
+//     const { code, new_password, email } = body;
+//     if (email) {
+//       if (!code && !new_password) {
+//         let queryEmail = "select email from users where email = $1";
+//         postgreDb.query(queryEmail, [email], (err, resEmail) => {
+//           if (err) {
+//             console.log(err.message);
+//             resolve(systemError());
+//           }
+//           if (resEmail.rows.length == 0) resolve(wrongData());
+//           const digits = "0123456789";
+//           let OTP = "";
+//           for (let i = 0; i < 6; i++) {
+//             OTP += digits[Math.floor(Math.random() * 10)];
+//           }
+//           client.get(OTP).then((results) => {
+//             if (results) return resolve(custMsg("Code already send to email!"));
+//             client
+//               .set(OTP, email, {
+//                 EX: 120,
+//                 NX: true,
+//               })
+//               .then(() => {
+//                 const data = {
+//                   message: "Link OTP send to email",
+//                   code: OTP,
+//                 };
+//                 resolve(success(data));
+//               });
+//           });
+//           // });
+//         });
+//       }
+//     }
+//     if (code && new_password && email) {
+//       client.get(code).then((results) => {
+//         if (!results || results !== email)
+//           return resolve(custMsg("Code OTP Wrong!"));
+//         bcrypt.hash(new_password, 10, (err, newHashedPassword) => {
+//           if (err) {
+//             console.log(err);
+//             return resolve(systemError());
+//           }
+//           const editPwdQuery =
+//             "UPDATE users SET password = $1, updated_at = now() WHERE email = $2";
+//           const editPwdValues = [newHashedPassword, results];
+//           postgreDb.query(editPwdQuery, editPwdValues, (err, response) => {
+//             if (err) {
+//               console.log(err);
+//               return resolve(systemError());
+//             }
+//             resolve(success(null));
+//             client.del(code).then(() => {
+//               return client.del(results).then();
+//             });
+//           });
+//         });
+//       });
+//     }
+//   });
+// };
 
 // const logoutUser = (token) => {
 //   return new Promise((resolve, reject) => {
