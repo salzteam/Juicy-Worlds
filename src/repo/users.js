@@ -325,7 +325,8 @@ const getUsersDatas = () => {
 const getUsersProfile = (token) => {
   return new Promise((resolve, reject) => {
     const query = "select * from users where id = $1";
-    const query2 = "select * from userdata where user_id = $1";
+    const query2 =
+      "select *, TO_CHAR(date_of_birth, 'DD/MM/YYYY')tanggal_lahir from userdata where user_id = $1";
     postgreDb.query(query, [token.user_id], (err, users) => {
       postgreDb.query(query2, [token.user_id], (err, profiles) => {
         if (err) {
