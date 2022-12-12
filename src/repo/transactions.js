@@ -223,6 +223,20 @@ const payment = (body, params) => {
   });
 };
 
+const paymentMidtrans = (status, transaction_id) => {
+  return new Promise((resolve) => {
+    let query = `update transactions set status_id = $1, updated_at = now() where id = $2`;
+    postgreDb
+      .query(query, [status, transaction_id])
+      .then((response) => {
+        resolve(success(response.rows[0]));
+      })
+      .catch((err) => {
+        console.log(err);
+        resolve(systemError());
+      });
+  });
+};
 const getTransactions = (queryParams, hostApi) => {
   return new Promise((resolve, reject) => {
     let link = `/api/v1/transactions?`;
@@ -473,7 +487,7 @@ const transactionsRepo = {
   historyTransactions,
   getPending,
   payment,
-  // sortingHistory,
+  paymentMidtrans,
 };
 
 module.exports = transactionsRepo;
