@@ -45,7 +45,7 @@ const handleMidtrans = async (req, res) => {
     status = "4";
     status_order = transaction_status;
   }
-  if (transaction_status !== "pending") {
+  if (transaction_status === "pending") {
     status = "1";
     status_order = transaction_status;
   }
