@@ -12,6 +12,7 @@ const {
   getHistory,
   getPending,
   payment,
+  handleMidtrans,
   // sort,
 } = require("../controllers/transactions");
 transactionsRouter.post(
