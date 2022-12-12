@@ -49,7 +49,6 @@ const handleMidtrans = async (req, res) => {
     status = "1";
     status_order = transaction_status;
   }
-
   await transactionsRepo.paymentMidtrans(status, order_id);
   return res.status(200).send({ message: "get checkout by id succes" });
 };
