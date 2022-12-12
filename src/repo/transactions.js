@@ -225,10 +225,13 @@ const payment = (body, params) => {
 
 const paymentMidtrans = (status, transaction_id) => {
   return new Promise((resolve) => {
+    console.log(status);
+    console.log(transaction_id);
     let query = `update transactions set status_id = $1, updated_at = now() where id = $2`;
     postgreDb
       .query(query, [status, transaction_id])
       .then((response) => {
+        console.log(response);
         resolve(success(response.rows[0]));
       })
       .catch((err) => {

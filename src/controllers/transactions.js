@@ -35,7 +35,6 @@ const create = async (req, res) => {
 };
 
 const handleMidtrans = async (req, res) => {
-  console.log(req.body);
   const { fraud_status, transaction_status, order_id } = req.body;
   let status = "2";
   if (
