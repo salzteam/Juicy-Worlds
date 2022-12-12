@@ -72,6 +72,6 @@ transactionsRouter.get(
   validate.body("sort", "page", "limit"),
   getPending
 );
-transactionsRouter.patch("/handlemidtrans", handleMidtrans);
+transactionsRouter.post("/handlemidtrans", handleMidtrans);
 // transactionsRouter.get("/history/sort/:id", sort);
 module.exports = transactionsRouter;
