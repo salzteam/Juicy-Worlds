@@ -13,8 +13,10 @@ const {
   getPending,
   payment,
   handleMidtrans,
+  setAll,
   // sort,
 } = require("../controllers/transactions");
+const allowedRole = require("../middlewares/allowedRole");
 transactionsRouter.post(
   "/create",
   isLogin(),
@@ -53,6 +55,7 @@ transactionsRouter.patch(
   validate.body("status_id", "payment_id"),
   payment
 );
+transactionsRouter.patch("/acceptall", isLogin(), allowedRole("admin"), setAll);
 transactionsRouter.get(
   "/",
   isLogin(),

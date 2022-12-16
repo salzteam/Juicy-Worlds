@@ -287,7 +287,7 @@ const getTransactions = (queryParams, hostApi) => {
           Counts += 1;
         }
       });
-      postgreDb.query(queryLimit, values, (err, result) => {
+      postgreDb.query(query, (err, result) => {
         if (err) {
           console.log(systemError(err.message));
           return resolve(systemError());
@@ -329,7 +329,7 @@ const getTransactions = (queryParams, hostApi) => {
           dataCount: Counts,
           next: resNext,
           prev: resPrev,
-          totalPage: Math.ceil(getData.rowCount / limit),
+          totalPage: Math.ceil(Counts / limit),
           data: newData,
         };
         return resolve(success(sendResponse));
@@ -424,6 +424,66 @@ const getPending = (queryParams, token) => {
   });
 };
 
+const setAll = () => {
+  return new Promise((resolve) => {
+    const queryCod =
+      "select tpm.transaction_id, ud.display_name, p.product_name, p.image, p.price, ct.category_name, t.tax, pm.method as mPayment, d.method, d.shipping, d.minimum_distance, d.charge_cost, ps.code, ps.discount, t.notes, st.status_name, s.size, s.cost, tpm.qty, tpm.subtotal from transactions_product_sizes tpm left join transactions t on tpm.transaction_id = t.id join userdata ud on t.user_id = ud.user_id join users u on ud.user_id = u.id join products p on tpm.product_id = p.id join categories ct on p.category_id = ct.id join payments pm on t.payment_id = pm.id join status st on t.status_id = st.id  join deliveries d on t.delivery_id = d.id FULL OUTER join promos ps on t.promo_id = ps.id join sizes s on tpm.size_id = s.id  where st.status_name = 'PENDING' and pm.method = 'Cash On Delivery'";
+    const queryCard =
+      "select tpm.transaction_id, ud.display_name, p.product_name, p.image, p.price, ct.category_name, t.tax, pm.method as mPayment, d.method, d.shipping, d.minimum_distance, d.charge_cost, ps.code, ps.discount, t.notes, st.status_name, s.size, s.cost, tpm.qty, tpm.subtotal from transactions_product_sizes tpm left join transactions t on tpm.transaction_id = t.id join userdata ud on t.user_id = ud.user_id join users u on ud.user_id = u.id join products p on tpm.product_id = p.id join categories ct on p.category_id = ct.id join payments pm on t.payment_id = pm.id join status st on t.status_id = st.id  join deliveries d on t.delivery_id = d.id FULL OUTER join promos ps on t.promo_id = ps.id join sizes s on tpm.size_id = s.id  where st.status_name = 'PAID' and pm.method = 'Card'";
+    const queryBank =
+      "select tpm.transaction_id, ud.display_name, p.product_name, p.image, p.price, ct.category_name, t.tax, pm.method as mPayment, d.method, d.shipping, d.minimum_distance, d.charge_cost, ps.code, ps.discount, t.notes, st.status_name, s.size, s.cost, tpm.qty, tpm.subtotal from transactions_product_sizes tpm left join transactions t on tpm.transaction_id = t.id join userdata ud on t.user_id = ud.user_id join users u on ud.user_id = u.id join products p on tpm.product_id = p.id join categories ct on p.category_id = ct.id join payments pm on t.payment_id = pm.id join status st on t.status_id = st.id  join deliveries d on t.delivery_id = d.id FULL OUTER join promos ps on t.promo_id = ps.id join sizes s on tpm.size_id = s.id  where st.status_name = 'PAID' and pm.method = 'Bank Account'";
+    postgreDb.query(queryCod, (err, resultCod) => {
+      if (err) return resolve(systemError());
+      if (resultCod.rows.length !== 0) {
+        let changeStatus =
+          "update transactions set status_id = $1,updated_at = now() where id = $2";
+        resultCod.rows.forEach((item) => {
+          postgreDb.query(
+            changeStatus,
+            ["3", item.transaction_id],
+            (errs, _) => {
+              if (errs) return resolve(systemError());
+            }
+          );
+        });
+        postgreDb.query(queryCard, (errCard, resultCard) => {
+          if (errCard) return resolve(systemError());
+          if (resultCard.rows.length !== 0) {
+            let changeStatus =
+              "update transactions set status_id = $1,updated_at = now() where id = $2";
+            resultCard.rows.forEach((item) => {
+              postgreDb.query(
+                changeStatus,
+                ["3", item.transaction_id],
+                (errs, _) => {
+                  if (errs) return resolve(systemError());
+                }
+              );
+            });
+            postgreDb.query(queryBank, (errBank, resultBank) => {
+              if (errBank) return resolve(systemError());
+              if (resultBank.rows.length !== 0) {
+                let changeStatus =
+                  "update transactions set status_id = $1,updated_at = now() where id = $2";
+                resultBank.rows.forEach((item) => {
+                  postgreDb.query(
+                    changeStatus,
+                    ["3", item.transaction_id],
+                    (errs, _) => {
+                      if (errs) return resolve(systemError());
+                    }
+                  );
+                });
+              }
+            });
+            resolve(success("Suksess"));
+          }
+        });
+      }
+    });
+  });
+};
+
 const historyTransactions = (queryParams, token, hostApi) => {
   return new Promise((resolve, reject) => {
     let link = ``;
@@ -514,6 +574,7 @@ const transactionsRepo = {
   getPending,
   payment,
   paymentMidtrans,
+  setAll,
 };
 
 module.exports = transactionsRepo;

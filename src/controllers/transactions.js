@@ -84,6 +84,10 @@ const getPending = async (req, res) => {
   const result = await transactionsRepo.getPending(req.query, req.userPayload);
   res.status(result.statusCode).send(result);
 };
+const setAll = async (req, res) => {
+  const result = await transactionsRepo.setAll();
+  res.status(result.statusCode).send(result);
+};
 const transactionsControllers = {
   create,
   drop,
@@ -93,6 +97,7 @@ const transactionsControllers = {
   getPending,
   payment,
   handleMidtrans,
+  setAll,
 };
 
 module.exports = transactionsControllers;
