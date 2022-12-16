@@ -279,11 +279,8 @@ const getTransactions = (queryParams, hostApi) => {
       let Counts = 0;
       getData.rows.forEach((item) => {
         if (
-          (item.mpayment === "Card" && item.status_name !== "PENDING") ||
-          (item.mpayment === "Bank Account" &&
-            item.status_name !== "PENDING") ||
-          (item.mpayment === "Bank Account" && item.status_name !== "DONE") ||
-          (item.mpayment === "Card" && item.status_name !== "DONE") ||
+          (item.mpayment === "Bank Account" && item.status_name === "PAID") ||
+          (item.mpayment === "Card" && item.status_name === "PAID") ||
           (item.mpayment === "Cash On Delivery" &&
             item.status_name === "PENDING")
         ) {
@@ -299,11 +296,8 @@ const getTransactions = (queryParams, hostApi) => {
         let newData = [];
         result.rows.forEach((item) => {
           if (
-            (item.mpayment === "Card" && item.status_name !== "PENDING") ||
-            (item.mpayment === "Bank Account" &&
-              item.status_name !== "PENDING") ||
-            (item.mpayment === "Bank Account" && item.status_name !== "DONE") ||
-            (item.mpayment === "Card" && item.status_name !== "DONE") ||
+            (item.mpayment === "Bank Account" && item.status_name === "PAID") ||
+            (item.mpayment === "Card" && item.status_name === "PAID") ||
             (item.mpayment === "Cash On Delivery" &&
               item.status_name === "PENDING")
           ) {
