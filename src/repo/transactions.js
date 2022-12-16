@@ -277,7 +277,7 @@ const getTransactions = (queryParams, hostApi) => {
         return resolve(systemError());
       }
       let Counts = 0;
-      getData.rows.forEach((item) => {
+      getData.rows.forEach((item, index) => {
         if (
           (item.mpayment === "Bank Account" && item.status_name === "PAID") ||
           (item.mpayment === "Card" && item.status_name === "PAID") ||
