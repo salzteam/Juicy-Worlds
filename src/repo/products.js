@@ -145,7 +145,7 @@ const editProducts = (body, params, file) => {
 
 const getProducts = (queryParams, hostApi) => {
   return new Promise((resolve, reject) => {
-    let link = `${hostApi}/api/v1/products?`;
+    let link = ``;
     let query = `select p.id, p.product_name, p.price, c.category_name, p.image, p.description from products p left join categories c on p.category_id = c.id`;
     let querPopular = `select p.id, p.product_name, p.price, c.category_name, p.image, COALESCE(sum(tpz.qty),0) as sold from products p left join transactions_product_sizes tpz on p.id = tpz.product_id join categories c on p.category_id = c.id group by p.id, p.product_name, p.price, c.category_name, p.image, p.created_at order by sold desc`;
     let queryLimit = "";
@@ -320,10 +320,10 @@ const getProducts = (queryParams, hostApi) => {
             prev = page - 1;
           }
           if (parseInt(next) <= parseInt(dataNext)) {
-            resNext = `page=${next}&limit=${limit}`;
+            resNext = `${link}page=${next}&limit=${limit}`;
           }
           if (parseInt(prev) !== 0) {
-            resPrev = `page=${prev}&limit=${limit}`;
+            resPrev = `${link}page=${prev}&limit=${limit}`;
           }
           let sendResponse = {
             dataCount: getData.rows.length,
