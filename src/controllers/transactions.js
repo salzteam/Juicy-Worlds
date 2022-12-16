@@ -10,7 +10,7 @@ let snap = new midtransClient.Snap({
 const create = async (req, res) => {
   const result = await transactionsRepo.transaction(req.body, req.userPayload);
   let sendData = { result };
-  if (req.body.payment === "1") {
+  if (req.body.payment === "1" || req.body.payment === "2") {
     let parameter = {
       transaction_details: {
         order_id: result.data.id_transactions,

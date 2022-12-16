@@ -276,12 +276,40 @@ const getTransactions = (queryParams, hostApi) => {
         console.log(systemError(err.message));
         return resolve(systemError());
       }
+      let Counts = 0;
+      getData.rows.forEach((item) => {
+        if (
+          (item.mpayment === "Card" && item.status_name !== "PENDING") ||
+          (item.mpayment === "Bank Account" &&
+            item.status_name !== "PENDING") ||
+          (item.mpayment === "Bank Account" && item.status_name !== "DONE") ||
+          (item.mpayment === "Card" && item.status_name !== "DONE") ||
+          (item.mpayment === "Cash On Delivery" &&
+            item.status_name === "PENDING")
+        ) {
+          Counts += 1;
+        }
+      });
       postgreDb.query(queryLimit, values, (err, result) => {
         if (err) {
           console.log(systemError(err.message));
           return resolve(systemError());
         }
         if (result.rows.length == 0) return resolve(notFound());
+        let newData = [];
+        result.rows.forEach((item) => {
+          if (
+            (item.mpayment === "Card" && item.status_name !== "PENDING") ||
+            (item.mpayment === "Bank Account" &&
+              item.status_name !== "PENDING") ||
+            (item.mpayment === "Bank Account" && item.status_name !== "DONE") ||
+            (item.mpayment === "Card" && item.status_name !== "DONE") ||
+            (item.mpayment === "Cash On Delivery" &&
+              item.status_name === "PENDING")
+          ) {
+            newData.push(item);
+          }
+        });
         let page = parseInt(queryParams.page);
         let limit = parseInt(queryParams.limit);
         let start = (page - 1) * limit;
@@ -304,11 +332,11 @@ const getTransactions = (queryParams, hostApi) => {
           resPrev = `${link}page=${prev}&limit=${limit}`;
         }
         let sendResponse = {
-          dataCount: getData.rowCount,
+          dataCount: Counts,
           next: resNext,
           prev: resPrev,
           totalPage: Math.ceil(getData.rowCount / limit),
-          data: result.rows,
+          data: newData,
         };
         return resolve(success(sendResponse));
       });
