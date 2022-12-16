@@ -327,7 +327,7 @@ const getTransactions = (queryParams, hostApi) => {
         }
         let sendResponse = {
           dataCount: Counts,
-          next: resNext,
+          next: null,
           prev: resPrev,
           totalPage: Math.ceil(Counts / limit),
           data: newData,
