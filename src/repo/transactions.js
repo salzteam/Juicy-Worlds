@@ -151,6 +151,7 @@ const transaction = (body, token) => {
 const deleteTransactions = (params) => {
   return new Promise((resolve, reject) => {
     const query2 = "delete from transactions where id = $1";
+    console.log(params);
     const query1 =
       "delete from transactions_product_sizes where transaction_id = $1";
     postgreDb

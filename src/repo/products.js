@@ -320,10 +320,10 @@ const getProducts = (queryParams, hostApi) => {
             prev = page - 1;
           }
           if (parseInt(next) <= parseInt(dataNext)) {
-            resNext = `${link}page=${next}&limit=${limit}`;
+            resNext = `page=${next}&limit=${limit}`;
           }
           if (parseInt(prev) !== 0) {
-            resPrev = `${link}page=${prev}&limit=${limit}`;
+            resPrev = `page=${prev}&limit=${limit}`;
           }
           let sendResponse = {
             dataCount: getData.rows.length,
