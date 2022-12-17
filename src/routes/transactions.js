@@ -55,7 +55,13 @@ transactionsRouter.patch(
   validate.body("status_id", "payment_id"),
   payment
 );
-transactionsRouter.patch("/acceptall", isLogin(), allowedRole("admin"), setAll);
+transactionsRouter.patch(
+  "/acceptall",
+  isLogin(),
+  allowedRole("admin"),
+  validate.body("status_id"),
+  setAll
+);
 transactionsRouter.get(
   "/",
   isLogin(),
