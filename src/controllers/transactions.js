@@ -85,6 +85,7 @@ const getPending = async (req, res) => {
   res.status(result.statusCode).send(result);
 };
 const setAll = async (req, res) => {
+  console.log(req.body);
   const result = await transactionsRepo.setAll();
   res.status(result.statusCode).send(result);
 };
