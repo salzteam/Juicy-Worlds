@@ -62,13 +62,6 @@ module.exports = {
               .json({ msg: "wrong input number phone", data: null });
           }
         }
-        if (key == "password") {
-          if (body[key].length < 8) {
-            return res
-              .status(400)
-              .json({ msg: "password is at least 8 letters", data: null });
-          }
-        }
         Object.assign(newBody, { [key]: body[key] });
       }
       req.body = newBody;
