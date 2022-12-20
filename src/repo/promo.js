@@ -259,7 +259,7 @@ const editPromo = (body, params, file) => {
 const getPromo = (queryParams, hostApi) => {
   return new Promise((resolve, reject) => {
     let link = `${hostApi}/api/v1/promo?`;
-    let query = `select pr.code, pr.*, TO_CHAR(pr.start, 'DD/MM/YYYY')start_promo ,TO_CHAR(pr.endexp, 'DD/MM/YYYY')end_promo ,p.product_name, p.price, c.category_name, p.image from promos pr left join products p on pr.product_id = p.id join categories c on p.category_id = c.id`;
+    let query = `select pr.code, pr.*, TO_CHAR(pr.start, 'YYYY-MM-DD')start_promo ,TO_CHAR(pr.endexp, 'YYYY-MM-DD')end_promo ,p.product_name, p.price, c.category_name, p.image from promos pr left join products p on pr.product_id = p.id join categories c on p.category_id = c.id`;
     let queryLimit = "";
     if (queryParams.search) {
       query += ` where lower(p.product_name) like lower('%${queryParams.search}%')`;
