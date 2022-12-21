@@ -28,7 +28,7 @@ mainRouter.get("/", (req, res) => {
 mainRouter.post(`/notification`, async (req, res) => {
   const { body } = req;
   const token =
-    "f7m9vCe5SdaCrmdYchSHR6:APA91bEqVr5V1LLN3Cyzd6ID87cYxu0pNGgOWxo6BFFRCXvBUmvoDFSG8rODybasACFv7u9Dc7wTjottzNka_q120Ze4jstZFWQ_gVk42U3uBs6Dd8tnZNzkrYCmmh0c28KEGq5RUv2l";
+    "frmbBakVSLGUkntnir8q0z:APA91bH4a_T_9IJt1uuXwem2NmBPwzmUmR7FMciivbWnMjLje0j-VotHPHz-4Z8knoK1Mf1EU5Arz8REsZbjAXTvr1uKirpE0jCVnG5n8BHwLatrCGBXcD9XQPNcR-AswnlHjDOutofw";
   try {
     await Notification.send({
       token,
