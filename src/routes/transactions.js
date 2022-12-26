@@ -20,19 +20,7 @@ const allowedRole = require("../middlewares/allowedRole");
 transactionsRouter.post(
   "/create",
   isLogin(),
-  validate.body(
-    "user_id",
-    "fee",
-    "payment",
-    "delivery",
-    "promo_id",
-    "notes",
-    "status",
-    "product_id",
-    "size",
-    "qty",
-    "subtotal"
-  ),
+  validate.body("fee", "payment", "delivery", "product"),
   create
 );
 transactionsRouter.delete(

@@ -26,120 +26,69 @@ const transaction = (body, token) => {
       };
       client.query("BEGIN", (err) => {
         if (shouldAbort(err)) return;
-        let {
-          fee,
-          payment,
-          delivery,
-          promo_id,
-          notes,
-          product_id,
-          size,
-          qty,
-          subtotal,
-          status_id,
-        } = body;
-        if (fee == null) fee = 0;
-        if (payment == null) payment = 4;
-        if (delivery == null) delivery = 0;
-        if (promo_id == null) promo_id = 999;
-        if (notes == null) notes = "-";
-        if (product_id == null) product_id = 0;
-        if (qty == null) qty = 0;
-        if (subtotal == null) subtotal = 0;
-        if (status_id == null) status_id = 1;
+        let { fee, payment, delivery, product } = body;
         const queryAddress = "SELECT adress from userdata where user_id = $1";
         client.query(queryAddress, [token.user_id], (err, resAddress) => {
-          let address = " ";
           if (shouldAbort(err)) return;
-          if (resAddress.rows[0].adress) address = resAddress.rows[0].adress;
+          if (resAddress.rows[0].adress === "-")
+            return shouldAbort({
+              stack: "Please fill in the address in edit profile",
+            });
           const queryText =
-            "insert into transactions (user_id, tax, payment_id, delivery_id, promo_id, notes, address, status_id) values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id";
+            "insert into transactions (user_id, tax, payment_id, delivery_id, address) values ($1,$2,$3,$4,$5) RETURNING id";
           client.query(
             queryText,
-            [
-              token.user_id,
-              fee,
-              payment,
-              delivery,
-              promo_id,
-              notes,
-              address,
-              status_id,
-            ],
+            [token.user_id, fee, payment, delivery, resAddress.rows[0].adress],
             (err, res) => {
               if (shouldAbort(err)) return;
               const insertPivot =
-                "insert into transactions_product_sizes (transaction_id, product_id, size_id, qty, subtotal) values ($1,$2,$3,$4,$5)";
+                "insert into transactions_product_sizes (transaction_id, product_id, size_id, qty, promo_id, subtotal) values ($1,$2,$3,$4,$5,$6)";
               const valuUser = res.rows[0].id;
-              client.query(
-                insertPivot,
-                [valuUser, product_id, size, qty, subtotal],
-                (err, res) => {
+              const productArray = new Function("return" + product + "")();
+              productArray.forEach((product, index) => {
+                if (index !== productArray.length - 1) {
                   client.query(
-                    "select * from products where id = $1",
-                    [product_id],
-                    (err, rest) => {
-                      client.query(
-                        "select * from sizes where id = $1",
-                        [size],
-                        (err, resSize) => {
-                          let discount = [];
-                          if (promo_id) {
-                            client.query(
-                              "select * from promos where product_id = $1",
-                              [product_id],
-                              (err, resPromo) => {
-                                discount.push(resPromo.rows[0]);
-                              }
-                            );
-                          }
-                          client.query(
-                            "select * from deliveries where id = $1",
-                            [delivery],
-                            (err, resDeliv) => {
-                              if (shouldAbort(err)) return;
-                              client.query("COMMIT", (err) => {
-                                if (err) {
-                                  console.error(
-                                    "Error committing transaction",
-                                    err.stack
-                                  );
-                                  resolve(systemError());
-                                }
-                                resolve(
-                                  created({
-                                    id_transactions: valuUser,
-                                    tax: fee,
-                                    payment: payment,
-                                    delivery_id: product_id,
-                                    shipping: resDeliv.rows[0].shipping,
-                                    minimun_distance:
-                                      resDeliv.rows[0].minimun_distance,
-                                    charge_cost: resDeliv.rows[0].charge_cost,
-                                    promo_id: promo_id,
-                                    discount: discount[2],
-                                    notes: notes,
-                                    status: "pending",
-                                    address: address,
-                                    product_id: product_id,
-                                    product_name: rest.rows[0].product_name,
-                                    price: rest.rows[0].price,
-                                    size: size,
-                                    cost_sizes: resSize.rows[0].cost,
-                                    qty: qty,
-                                    subtotal: subtotal,
-                                  })
-                                );
-                                done();
-                              });
-                            }
-                          );
-                        }
-                      );
+                    insertPivot,
+                    [
+                      valuUser,
+                      product.product_id,
+                      product.size_id,
+                      product.qty,
+                      product.promo_id,
+                      product.subtotal,
+                    ],
+                    (err, res) => {
+                      if (shouldAbort(err)) return;
                     }
                   );
                 }
-              );
+                if (index === productArray.length - 1) {
+                  client.query(
+                    insertPivot,
+                    [
+                      valuUser,
+                      product.product_id,
+                      product.size_id,
+                      product.qty,
+                      product.promo_id,
+                      product.subtotal,
+                    ],
+                    (err, res) => {
+                      if (shouldAbort(err)) return;
+                      client.query("COMMIT", (err) => {
+                        if (err) {
+                          console.error(
+                            "Error committing transaction",
+                            err.stack
+                          );
+                          resolve(systemError());
+                        }
+                      });
+                      resolve(success("Created!"));
+                    }
+                  );
+                }
+              });
             }
           );
         });
@@ -245,7 +194,7 @@ const getTransactions = (queryParams, hostApi) => {
   return new Promise((resolve, reject) => {
     let link = ``;
     let query =
-      "select tpm.transaction_id, ud.display_name, p.product_name, p.image, p.price, ct.category_name, t.tax, pm.method as mPayment, d.method, d.shipping, d.minimum_distance, d.charge_cost, ps.code, ps.discount, t.notes, st.status_name, s.size, s.cost, tpm.qty, tpm.subtotal from transactions_product_sizes tpm left join transactions t on tpm.transaction_id = t.id join userdata ud on t.user_id = ud.user_id join users u on ud.user_id = u.id join products p on tpm.product_id = p.id join categories ct on p.category_id = ct.id join payments pm on t.payment_id = pm.id join status st on t.status_id = st.id  join deliveries d on t.delivery_id = d.id FULL OUTER join promos ps on t.promo_id = ps.id join sizes s on tpm.size_id = s.id  where  st.status_name != 'CANCEL' and pm.method != 'none'";
+      "select tpm.transaction_id, ud.display_name, p.product_name, p.image, p.price, ct.category_name, t.tax, pm.method as mPayment, d.method, d.shipping, d.minimum_distance, d.charge_cost, ps.code, ps.discount,  st.status_name, s.size, s.cost, tpm.qty, tpm.subtotal from transactions_product_sizes tpm left join transactions t on tpm.transaction_id = t.id join userdata ud on t.user_id = ud.user_id join users u on ud.user_id = u.id join products p on tpm.product_id = p.id join categories ct on p.category_id = ct.id join payments pm on t.payment_id = pm.id join status st on t.status_id = st.id  join deliveries d on t.delivery_id = d.id FULL OUTER join promos ps on tpm.promo_id = ps.id join sizes s on tpm.size_id = s.id  where  st.status_name != 'CANCEL' and pm.method != 'none'";
     let queryLimit = "";
     if (queryParams.sort == "newest") {
       query += " order by t.created_at desc";
@@ -301,7 +250,16 @@ const getTransactions = (queryParams, hostApi) => {
             (item.mpayment === "Cash On Delivery" &&
               item.status_name === "PENDING")
           ) {
-            newData.push(item);
+            if (item.discount !== 0) {
+              let newItem = {
+                ...item,
+                price: (parseInt(item.discount) / 100) * parseInt(item.price),
+              };
+              newData.push(newItem);
+            }
+            if (item.discount === 0) {
+              newData.push(item);
+            }
           }
         });
         let page = parseInt(queryParams.page);
@@ -499,7 +457,12 @@ const setAll = () => {
 const historyTransactions = (queryParams, token, hostApi) => {
   return new Promise((resolve, reject) => {
     let link = ``;
-    let query = `select tpm.transaction_id, ud.display_name, p.product_name, p.price, ct.category_name, t.tax, pm.method, d.method, d.shipping, d.minimum_distance, d.charge_cost, ps.code, ps.discount, t.notes, st.status_name, s.size, s.cost, tpm.qty, tpm.subtotal, p.image from transactions_product_sizes tpm left join transactions t on tpm.transaction_id = t.id join userdata ud on t.user_id = ud.user_id join users u on ud.user_id = u.id join products p on tpm.product_id = p.id join categories ct on p.category_id = ct.id join payments pm on t.payment_id = pm.id join status st on t.status_id = st.id  join deliveries d on t.delivery_id = d.id FULL OUTER join promos ps on t.promo_id = ps.id join sizes s on tpm.size_id = s.id where u.id = $1`;
+    let query = `select tpm.transaction_id, ud.display_name, p.product_name, p.price, ct.category_name, t.tax, pm.method, d.method, d.shipping, d.minimum_distance, d.charge_cost, ps.code,
+    ps.discount, st.status_name, s.size, s.cost, tpm.qty, tpm.subtotal, p.image from transactions_product_sizes tpm
+    left join transactions t on tpm.transaction_id = t.id join userdata ud on t.user_id = ud.user_id join users u on ud.user_id = u.id
+    join products p on tpm.product_id = p.id join categories ct on p.category_id = ct.id join payments pm on t.payment_id = pm.id
+    join status st on t.status_id = st.id  join deliveries d on t.delivery_id = d.id FULL OUTER join promos ps on tpm.promo_id = ps.id
+    join sizes s on tpm.size_id = s.id where u.id = $1`;
     let queryLimit = "";
     if (queryParams.sort == "newest") {
       query += " order by t.created_at desc";
@@ -535,6 +498,34 @@ const historyTransactions = (queryParams, token, hostApi) => {
           return resolve(systemError());
         }
         if (result.rows.length == 0) return resolve(notFound());
+        let dataResponse = [];
+        result.rows.forEach((data) => {
+          let price = data.price;
+          if (data.discount)
+            price = (parseInt(data.discount) / 100) * parseInt(data.price);
+          const newData = {
+            transaction_id: data.transaction_id,
+            display_name: data.display_name,
+            product_name: data.product_name,
+            price: price,
+            normal_price: data.price,
+            category_name: data.category_name,
+            tax: data.tax,
+            method: data.method,
+            shipping: data.shipping,
+            minimum_distance: data.minimum_distance,
+            charge_cost: data.charge_cost,
+            code: data.code,
+            discount: data.discount,
+            status_name: data.status_name,
+            size: data.size,
+            cost: data.cost,
+            qty: data.qty,
+            subtotal: data.subtotal,
+            image: data.image,
+          };
+          dataResponse.push(newData);
+        });
         let resNext = null;
         let resPrev = null;
         if (queryParams.page && queryParams.limit) {
@@ -560,7 +551,7 @@ const historyTransactions = (queryParams, token, hostApi) => {
             next: resNext,
             prev: resPrev,
             totalPage: dataNext,
-            data: result.rows,
+            data: dataResponse,
           };
           return resolve(success(sendResponse));
         }
@@ -569,7 +560,7 @@ const historyTransactions = (queryParams, token, hostApi) => {
           next: resNext,
           prev: resPrev,
           totalPage: null,
-          data: result.rows,
+          data: dataResponse,
         };
         return resolve(success(sendResponse));
       });
