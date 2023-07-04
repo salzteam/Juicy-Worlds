@@ -26,7 +26,16 @@ const transaction = (body, token) => {
       };
       client.query("BEGIN", (err) => {
         if (shouldAbort(err)) return;
-        let { fee, payment, delivery, product } = body;
+        let {
+          fee,
+          payment,
+          delivery,
+          product_id,
+          size,
+          qty,
+          promo_id,
+          subtotal,
+        } = body;
         const queryAddress = "SELECT adress from userdata where user_id = $1";
         client.query(queryAddress, [token.user_id], (err, resAddress) => {
           if (shouldAbort(err)) return;
@@ -44,51 +53,69 @@ const transaction = (body, token) => {
               const insertPivot =
                 "insert into transactions_product_sizes (transaction_id, product_id, size_id, qty, promo_id, subtotal) values ($1,$2,$3,$4,$5,$6)";
               const valuUser = res.rows[0].id;
-              const productArray = new Function("return" + product + "")();
-              productArray.forEach((product, index) => {
-                if (index !== productArray.length - 1) {
-                  client.query(
-                    insertPivot,
-                    [
-                      valuUser,
-                      product.product_id,
-                      product.size_id,
-                      product.qty,
-                      product.promo_id,
-                      product.subtotal,
-                    ],
-                    (err, res) => {
-                      if (shouldAbort(err)) return;
+              client.query(
+                insertPivot,
+                [valuUser, product_id, size, qty, promo_id, subtotal],
+                (err, res) => {
+                  if (shouldAbort(err)) return;
+                  client.query("COMMIT", (err) => {
+                    if (err) {
+                      console.error("Error committing transaction", err.stack);
+                      resolve(systemError());
                     }
-                  );
+                  });
+                  const response = {
+                    id_transactions: valuUser,
+                  };
+                  console.log(response);
+                  resolve(success(response));
                 }
-                if (index === productArray.length - 1) {
-                  client.query(
-                    insertPivot,
-                    [
-                      valuUser,
-                      product.product_id,
-                      product.size_id,
-                      product.qty,
-                      product.promo_id,
-                      product.subtotal,
-                    ],
-                    (err, res) => {
-                      if (shouldAbort(err)) return;
-                      client.query("COMMIT", (err) => {
-                        if (err) {
-                          console.error(
-                            "Error committing transaction",
-                            err.stack
-                          );
-                          resolve(systemError());
-                        }
-                      });
-                      resolve(success("Created!"));
-                    }
-                  );
-                }
-              });
+              );
+              // const productArray = new Function("return" + body + "")();
+              // productArray.forEach((product, index) => {
+              //   if (index !== productArray.length - 1) {
+              //     client.query(
+              //       insertPivot,
+              //       [
+              //         valuUser,
+              //         product.product_id,
+              //         product.size_id,
+              //         product.qty,
+              //         product.promo_id,
+              //         product.subtotal,
+              //       ],
+              //       (err, res) => {
+              //         if (shouldAbort(err)) return;
+              //       }
+              //     );
+              //   }
+              //   if (index === productArray.length - 1) {
+              //     client.query(
+              //       insertPivot,
+              //       [
+              //         valuUser,
+              //         product.product_id,
+              //         product.size_id,
+              //         product.qty,
+              //         product.promo_id,
+              //         product.subtotal,
+              //       ],
+              //       (err, res) => {
+              //         if (shouldAbort(err)) return;
+              //         client.query("COMMIT", (err) => {
+              //           if (err) {
+              //             console.error(
+              //               "Error committing transaction",
+              //               err.stack
+              //             );
+              //             resolve(systemError());
+              //           }
+              //         });
+              //         resolve(success("Created!"));
+              //       }
+              //     );
+              //   }
+              // });
             }
           );
         });

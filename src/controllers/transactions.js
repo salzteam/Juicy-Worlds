@@ -9,12 +9,13 @@ let snap = new midtransClient.Snap({
 
 const create = async (req, res) => {
   const result = await transactionsRepo.transaction(req.body, req.userPayload);
+  console.log(result);
   let sendData = { result };
   if (req.body.payment === "1" || req.body.payment === "2") {
     let parameter = {
       transaction_details: {
         order_id: result.data.id_transactions,
-        gross_amount: result.data.subtotal,
+        gross_amount: req.body.subtotal,
       },
       credit_card: {
         secure: true,
