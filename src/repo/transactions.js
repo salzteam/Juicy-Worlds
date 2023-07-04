@@ -373,10 +373,21 @@ const getTransactions = (queryParams, hostApi) => {
 
 const getPending = (queryParams, token) => {
   return new Promise((resolve, reject) => {
-    const query =
-      "select tpm.transaction_id, ud.display_name, p.product_name, p.price, ct.category_name, t.tax, pm.method, d.method, d.shipping, d.minimum_distance, d.charge_cost, ps.code, ps.discount, t.notes, st.status_name, s.size, s.cost, tpm.qty, tpm.subtotal, p.image, s.cost from transactions_product_sizes tpm left join transactions t on tpm.transaction_id = t.id join userdata ud on t.user_id = ud.user_id join users u on ud.user_id = u.id join products p on tpm.product_id = p.id join categories ct on p.category_id = ct.id join payments pm on t.payment_id = pm.id join status st on t.status_id = st.id  join deliveries d on t.delivery_id = d.id FULL OUTER join promos ps on t.promo_id = ps.id join sizes s on tpm.size_id = s.id where st.status_name = 'PENDING' AND u.id = $1";
+    const query = `select tpm.transaction_id, ud.display_name, p.product_name, p.price, ct.category_name, t.tax, pm.method, d.method, d.shipping, d.minimum_distance, d.charge_cost, ps.code, ps.discount, st.status_name, s.size, s.cost, tpm.qty, tpm.subtotal, p.image, s.cost from transactions_product_sizes tpm 
+      left join transactions t on tpm.transaction_id = t.id 
+      join userdata ud on t.user_id = ud.user_id 
+      join users u on ud.user_id = u.id 
+      join products p on tpm.product_id = p.id 
+      join categories ct on p.category_id = ct.id 
+      join payments pm on t.payment_id = pm.id 
+      join status st on t.status_id = st.id  
+      join deliveries d on t.delivery_id = d.id 
+      FULL OUTER join promos ps on tpm.promo_id = ps.id join sizes s on tpm.size_id = s.id where st.status_name = 'PENDING' AND u.id = $1`;
     postgreDb.query(query, [token.user_id], (err, result) => {
-      if (err) return resolve(systemError());
+      if (err) {
+        console.log(err);
+        return resolve(systemError());
+      }
       resolve(success(result.rows));
     });
   });
